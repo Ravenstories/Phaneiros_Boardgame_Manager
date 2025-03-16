@@ -1,0 +1,234 @@
+/* Ensure the body takes up the full height of the viewport */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Cinzel';
+
+    
+
+}
+
+/* Style the header */
+header {
+    background-color: #0f220f;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+    .fade-border {
+        width: 300px;
+        height: 200px;
+        background-color: lightgrey;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        position: relative;
+    }
+
+    .fade-border::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+    }
+
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.5em;
+}
+
+/* Navigation links */
+nav a {
+    color: white;
+    text-decoration: none;
+    padding: 0 10px;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+/* Centering the main container */
+main {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    height: calc(100vh - 100px); /* Fill remaining space after the header */
+    background-color: #163029;
+
+}
+
+/* The content inside the #app */
+#app {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    min-width: 300px; /* Ensure a reasonable minimum width */
+    max-width: 600px; /* Constrain the maximum width */
+    width: 100%; /* Ensure the content fills available space */
+}
+
+/* Style the button */
+button {
+    padding: 10px 20px;
+    background-color: #3e8e41;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+button:hover {
+    background-color: #2f6b31;
+}
+
+h2 {
+    font-family: 'Julius Sans One', sans-serif;
+    margin-bottom: 20px;
+}
+
+/* Kingdom Dashboard Layout */
+.kingdom-dashboard {
+    background-color: #1d5b91;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    width: 80%;
+    max-width: 1200px;
+}
+
+/* Resources Panel */
+.resources {
+    grid-column: 1 / 2;
+    padding: 20px;
+    border: 2px solid #26805e;
+    border-radius: 8px;
+    background-color: #26805e;
+}
+
+.resources h2 {
+    text-align: center;
+}
+
+.resources p {
+    font-size: 16px;
+    line-height: 2;
+}
+
+/* Actions Panel */
+.controls {
+    grid-column: 2 / 3;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.controls h2 {
+    margin-bottom: 15px;
+}
+
+.controls button {
+    padding: 10px 20px;
+    margin: 5px;
+    font-size: 16px;
+    background-color: #802626;
+    color: #FFFF;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.controls button:hover {
+    background-color: #45a049;
+}
+
+/* Buildings Panel */
+.buildings {
+    grid-column: 3 / 4;
+    padding: 20px;
+    border: 2px solid #26805e;
+    border-radius: 8px;
+    background-color: #26805e;
+}
+
+.buildings h2 {
+    text-align: center;
+}
+
+.buildings div {
+    margin-bottom: 20px;
+}
+
+.buildings button {
+    padding: 10px 20px;
+    background-color: #802626;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.buildings button:hover {
+    background-color: #45a049;
+}
+
+.start-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+#start-game-btn {
+    padding: 20px 40px;
+    font-size: 24px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+#start-game-btn:hover {
+    background-color: #45a049;
+}
+
+/* Responsive design for mobile devices */
+@media (max-width: 768px) {
+    .kingdom-dashboard {
+        grid-template-columns: 1fr;
+    }
+}
+
+/*Google Fonts*/
+
+.julius-sans-one-regular {
+    font-family: "Julius Sans One", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.uncial-antiqua-regular {
+    font-family: "Uncial Antiqua", system-ui;
+    font-weight: 400;
+    font-style: normal;
+  }
