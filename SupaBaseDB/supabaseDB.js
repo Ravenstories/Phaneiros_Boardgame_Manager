@@ -4,9 +4,8 @@ require('dotenv').config();
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
-// Example: Fetch all kingdoms
-async function fetchKingdoms() {
-    let { data, error } = await supabase.from('kingdoms').select('*');
+async function fetchFromDB(key) {
+    let { data, error } = await supabase.from(key).select('*');
     if (error) console.error(error);
     console.log(data);
 }
@@ -15,4 +14,4 @@ async function fetchKingdoms() {
 const { createClient } = require('@supabase/supabase-js');
 
 
-fetchKingdoms();
+fetchFromDB("kingdoms");
