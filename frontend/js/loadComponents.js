@@ -19,6 +19,10 @@ export function loadComponent(componentName) {
             componentHTMLPath       = 'frontend/pages/KingdomOverviewScreen/kingdomOverviewScreen.html';
             componentJSPath         = 'frontend/pages/KingdomOverviewScreen/kingdomOverviewScreen.js';
             break;
+        case 'mapScreen':
+            componentHTMLPath       = 'frontend/pages/MapScreen/mapScreen.html';
+            componentJSPath         = 'frontend/pages/MapScreen/mapScreen.js';
+            break;
         default:
             componentHTMLPath       = 'frontend/pages/start/start.html';
             componentJSPath         = 'frontend/pages/start/start.js';
