@@ -8,8 +8,8 @@ export function loadComponent(componentName) {
     
     switch (componentName) {
         case 'start':
-            componentHTMLPath       = 'frontend/pages/start/start.html';
-            componentJSPath         = 'frontend/pages/start/start.js';
+            componentHTMLPath       = 'frontend/pages/Start/start.html';
+            componentJSPath         = 'frontend/pages/Start/start.js';
             break;
         case 'kingdomCreation':
             componentHTMLPath       = 'frontend/pages/KingdomCreationScreen/kingdomCreationScreen.html';
@@ -24,8 +24,8 @@ export function loadComponent(componentName) {
             componentJSPath         = 'frontend/pages/MapScreen/mapScreen.js';
             break;
         default:
-            componentHTMLPath       = 'frontend/pages/start/start.html';
-            componentJSPath         = 'frontend/pages/start/start.js';
+            componentHTMLPath       = 'frontend/pages/Start/start.html';
+            componentJSPath         = 'frontend/pages/Start/start.js';
     }
 
     // Fetch the component HTML and inject it into the app container
