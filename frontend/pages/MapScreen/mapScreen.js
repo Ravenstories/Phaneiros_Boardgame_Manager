@@ -1,4 +1,4 @@
-// frontend/pages/MapScreen/hex_map.js
+import { fetchMapTiles } from '../../SupaBaseDB/mapApi.js';
 
 const HEX_SIZE = 40;
 const WIDTH = HEX_SIZE * 2;
@@ -12,13 +12,6 @@ const TERRAIN_COLORS = {
   Water:    '#1e90ff',
 };
 
-/**
- * Calculate the corner point of a hexagon.
- * @param {number} cx - center x
- * @param {number} cy - center y
- * @param {number} i  - corner index (0–5)
- * @returns {{x:number,y:number}}
- */
 function hexCorner(cx, cy, i) {
   const angleDeg = 60 * i - 30;
   const angleRad = Math.PI / 180 * angleDeg;
@@ -28,23 +21,14 @@ function hexCorner(cx, cy, i) {
   };
 }
 
-/**
- * Draw a single hex tile into the SVG container.
- * @param {object} tile - { x, y, label, terrain, impassable }
- * @param {SVGElement} svg
- */
 function drawHex(tile, svg) {
   const { x, y, label, terrain, impassable } = tile;
   const px = WIDTH * (x + 0.5 * (y % 2));
   const py = HEIGHT * y * 0.75;
 
-  // Compute corner points
   const corners = Array.from({ length: 6 }, (_, i) => hexCorner(px, py, i));
-  const pathD = corners
-    .map((pt, i) => `${i === 0 ? 'M' : 'L'} ${pt.x} ${pt.y}`)
-    .join(' ') + ' Z';
+  const pathD = corners.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ' Z';
 
-  // Draw hexagon
   const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
   path.setAttribute('d', pathD);
   path.setAttribute('fill', TERRAIN_COLORS[terrain] || '#888');
@@ -52,7 +36,6 @@ function drawHex(tile, svg) {
   path.setAttribute('stroke-width', '1.5');
   svg.appendChild(path);
 
-  // Draw impassable edges (e.g. rivers) in red
   if (Array.isArray(impassable)) {
     impassable.forEach(side => {
       const a = corners[(side - 1 + 6) % 6];
@@ -68,7 +51,6 @@ function drawHex(tile, svg) {
     });
   }
 
-  // Draw label
   const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
   text.setAttribute('x', px);
   text.setAttribute('y', py + 4);
@@ -79,21 +61,13 @@ function drawHex(tile, svg) {
   svg.appendChild(text);
 }
 
-/**
- * Fetch map data from the backend, transform it, and render.
- */
 async function loadMap() {
   const svg = document.getElementById('hexmap');
-  // Clear any existing children (in case of reload)
   while (svg.firstChild) svg.removeChild(svg.firstChild);
 
   try {
-    const res = await fetch('/api/tiles'); // your real API endpoint
-    if (!res.ok) throw new Error(`Fetch error ${res.status}`);
-    const tiles = await res.json();
-
-    tiles.forEach(raw => {
-      // Transform API fields to what drawHex expects
+    const rawTiles = await fetchMapTiles();
+    rawTiles.forEach(raw => {
       const tile = {
         x:          raw.x,
         y:          raw.y,
@@ -105,8 +79,7 @@ async function loadMap() {
     });
   } catch (err) {
     console.error('Error loading map data:', err);
-    // Optionally display an error message in the UI
-    const errorText = document.createElement('text');
+    const errorText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     errorText.setAttribute('x', 20);
     errorText.setAttribute('y', 20);
     errorText.setAttribute('fill', 'red');
@@ -115,5 +88,4 @@ async function loadMap() {
   }
 }
 
-// Kick off map loading when this script is loaded
 loadMap();
