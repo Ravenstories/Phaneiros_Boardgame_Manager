@@ -3,12 +3,14 @@ import express from 'express';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { tilesRouter } from './routes/tiles.js';
+import { gamesRouter } from './routes/games.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 
 // API
 app.use('/api/tiles', tilesRouter);
+app.use('/api/games', gamesRouter);
 
 // Serve static front‑end
 app.use(express.static(path.join(__dirname, '..', 'frontend')));

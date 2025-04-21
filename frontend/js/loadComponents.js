@@ -1,50 +1,88 @@
 // frontend/js/loadComponents.js
-export async function loadComponent(componentName) {
-    const app = document.getElementById('app');
-  
-    // Resolve paths (absolute keeps it simple)
-    const base = '/frontend/pages';
-    const routes = {
-      start:             `/${base}/Start/start`,
-      kingdomCreation:   `/${base}/KingdomCreationScreen/kingdomCreationScreen`,
-      kingdomOverview:   `/${base}/KingdomOverviewScreen/kingdomOverviewScreen`,
-      mapScreen:         `/${base}/MapScreen/mapScreen`
-    };
-    const path = routes[componentName] || routes.start;
-  
-    try {
-      /* ---------- fetch & parse HTML ---------- */
-      const htmlText = await fetch(`${path}.html`).then(r => r.text());
-      const doc      = new DOMParser().parseFromString(htmlText, 'text/html');
-  
-      // ♻️ inject only #page-content children
-      const fragment = doc.querySelector('#page-content');
-      if (!fragment) throw new Error('Missing #page-content wrapper');
-      app.innerHTML = fragment.innerHTML;
-  
-      /* ---------- load corresponding JS ---------- */
-      await loadScript(`${path}.js`);
-    } catch (err) {
-      console.error(err);
-      app.innerHTML = '<p>Error loading content.</p>';
-    }
+// ------------------------------------------------------------------
+// Tiny in‑house router / component loader
+// ------------------------------------------------------------------
+//  * Each screen lives in /frontend/pages/<Screen>/<file>.html + .js
+//  * The HTML file must wrap its visible content in
+//      <main id="page-content"> … </main>
+//  * loadComponent(screen) fetches the fragment and the matching JS
+//  * We keep history.pushState so the back‑button works.
+// ------------------------------------------------------------------
+
+const APP_EL = document.getElementById('app');
+if (!APP_EL) {
+  throw new Error('[loadComponents] #app element not found – check index.html');
+}
+
+// Map logical names to files (without extension). KEEP THESE IN SYNC
+// with folder names under /frontend/pages
+const PAGE_BASE = 'pages'; // resolved relative to site root
+const ROUTES = {
+  start:             `${PAGE_BASE}/Start/start`,
+  kingdomCreation:   `${PAGE_BASE}/KingdomCreationScreen/kingdomCreationScreen`,
+  kingdomOverview:   `${PAGE_BASE}/KingdomOverviewScreen/kingdomOverviewScreen`,
+  mapScreen:         `${PAGE_BASE}/MapScreen/mapScreen`
+};
+
+/**
+ * Load a component (HTML fragment + JS) into #app.
+ * @param {keyof typeof ROUTES} name
+ */
+export async function loadComponent(name = 'start') {
+  const path = ROUTES[name] || ROUTES.start;
+
+  try {
+    const html = await fetchFragment(`${path}.html`);
+    APP_EL.innerHTML = html; // replace panel content
+
+    await loadScript(`${path}.js`);
+
+    // Update address bar so reload/back keeps state
+    pushHistory(name);
+  } catch (err) {
+    console.error('[loadComponents] failed:', err);
+    APP_EL.innerHTML = '<p style="text-align:center;margin-top:3rem">Error loading content.</p>';
   }
-  
-  /* helper – returns a Promise that resolves when script is loaded */
-  function loadScript(src) {
-    return new Promise((res, rej) => {
-      const s = Object.assign(document.createElement('script'), {
-        src,
-        type: 'module',
-        onload: res,
-        onerror: rej
-      });
-      document.body.append(s);
-    });
+}
+
+/* -------------------------------------------------------------
+ * Helpers
+ * ------------------------------------------------------------- */
+
+/** Fetch HTML, extract #page-content innerHTML. */
+async function fetchFragment(url) {
+  const res = await fetch(url, { cache: 'no-store' });
+  if (!res.ok) throw new Error(`HTTP ${res.status} while fetching ${url}`);
+
+  const txt  = await res.text();
+  const doc  = new DOMParser().parseFromString(txt, 'text/html');
+  const main = doc.querySelector('#page-content');
+  if (!main) throw new Error(`${url} is missing <main id=\"page-content\">`);
+  return main.innerHTML;
+}
+
+/** Dynamically import a module script. */
+function loadScript(src) {
+  return import(`/${src}?v=${Date.now()}`); // cache‑bust to ensure latest
+}
+
+/** Push state without reloading. */
+function pushHistory(name) {
+  // Build pretty URL like /start or /mapScreen
+  const url = `/${name}`;
+  if (location.pathname !== url) {
+    history.pushState({ screen: name }, '', url);
   }
-  
-  window.loadComponent = loadComponent;
-  
-  /* boot screen */
-  document.addEventListener('DOMContentLoaded', () => loadComponent('start'));
-  
+}
+
+// Handle back/forward navigation
+window.addEventListener('popstate', (ev) => {
+  const screen = ev.state?.screen || 'start';
+  loadComponent(screen);
+});
+
+// Expose globally for inline onclick="" handlers
+window.loadComponent = loadComponent;
+
+// Initial screen
+document.addEventListener('DOMContentLoaded', () => loadComponent('start'));
