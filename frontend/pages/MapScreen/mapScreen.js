@@ -1,11 +1,7 @@
-/* ──────────────────────────────────────────────────────────────
-   frontend/js/pages/MapScreen/mapScreen.js
-   ────────────────────────────────────────────────────────────── */
-
-   import { fetchMapTiles } from '../../api/mapAPI.js';
+   import { fetchMapTiles } from '../../js/api/mapAPI.js';
 
    /* ========== CONFIG ==========
-      Tweak these to fit your design
+      Tweak these to fit design
       --------------------------- */
    const HEX_SIZE        = 50;          // px, width tip‑to‑tip
    const HEX_GAP         = 4;           // px, gap between hexes

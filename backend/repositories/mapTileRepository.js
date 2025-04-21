@@ -1,4 +1,4 @@
-import { supabase } from './supabaseClient.js';
+import { supabase } from '../supabaseClient.js';
 
 /**
  * Get **all** territories (aka map tiles).

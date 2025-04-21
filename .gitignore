@@ -4,3 +4,4 @@ dist/
 secret/
 secret.json
 secret.txt
+*.env

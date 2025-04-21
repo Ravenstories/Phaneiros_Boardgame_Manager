@@ -1,4 +1,4 @@
-import { getAllTiles } from './mapTileRepository.js';
+import { getAllTiles } from '../repositories/mapTileRepository.js'
 
 /**
  * Return the tiles that belong to one game.
