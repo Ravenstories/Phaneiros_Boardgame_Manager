@@ -3,15 +3,13 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.49.1",
     "dotenv": "^16.4.7",
-    "express": "^4.19.2"
+    "express": "^4.21.2"
   },
   "scripts": {
-    "dev:backend": "node backend/server.js",
-    "dev:frontend": "http-server . -c-1",
-    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\""
+    "dev": "nodemon backend/server.js",
+    "start": "NODE_ENV=production node backend/server.js"
   },
   "devDependencies": {
-    "concurrently": "^9.1.2",
-    "http-server": "^14.1.1"
+    "nodemon": "^3.1.9"
   }
 }

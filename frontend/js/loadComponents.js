@@ -5,10 +5,10 @@ export async function loadComponent(componentName) {
     // Resolve paths (absolute keeps it simple)
     const base = '/frontend/pages';
     const routes = {
-      start:             `${base}/Start/start`,
-      kingdomCreation:   `${base}/KingdomCreationScreen/kingdomCreationScreen`,
-      kingdomOverview:   `${base}/KingdomOverviewScreen/kingdomOverviewScreen`,
-      mapScreen:         `${base}/MapScreen/mapScreen`
+      start:             `/${base}/Start/start`,
+      kingdomCreation:   `/${base}/KingdomCreationScreen/kingdomCreationScreen`,
+      kingdomOverview:   `/${base}/KingdomOverviewScreen/kingdomOverviewScreen`,
+      mapScreen:         `/${base}/MapScreen/mapScreen`
     };
     const path = routes[componentName] || routes.start;
   
