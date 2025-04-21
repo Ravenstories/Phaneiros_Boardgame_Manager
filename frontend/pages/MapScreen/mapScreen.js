@@ -1,91 +1,109 @@
-import { fetchMapTiles } from '../../SupaBaseDB/mapApi.js';
+/* ──────────────────────────────────────────────────────────────
+   frontend/js/pages/MapScreen/mapScreen.js
+   ────────────────────────────────────────────────────────────── */
 
-const HEX_SIZE = 40;
-const WIDTH = HEX_SIZE * 2;
-const HEIGHT = Math.sqrt(3) * HEX_SIZE;
+   import { fetchMapTiles } from '../../api/mapAPI.js';
 
-const TERRAIN_COLORS = {
-  Plains:   '#aaa',
-  Forest:   '#2e8b57',
-  Hill:     '#a0522d',
-  Mountain: '#696969',
-  Water:    '#1e90ff',
-};
-
-function hexCorner(cx, cy, i) {
-  const angleDeg = 60 * i - 30;
-  const angleRad = Math.PI / 180 * angleDeg;
-  return {
-    x: cx + HEX_SIZE * Math.cos(angleRad),
-    y: cy + HEX_SIZE * Math.sin(angleRad)
-  };
-}
-
-function drawHex(tile, svg) {
-  const { x, y, label, terrain, impassable } = tile;
-  const px = WIDTH * (x + 0.5 * (y % 2));
-  const py = HEIGHT * y * 0.75;
-
-  const corners = Array.from({ length: 6 }, (_, i) => hexCorner(px, py, i));
-  const pathD = corners.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ' Z';
-
-  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-  path.setAttribute('d', pathD);
-  path.setAttribute('fill', TERRAIN_COLORS[terrain] || '#888');
-  path.setAttribute('stroke', '#333');
-  path.setAttribute('stroke-width', '1.5');
-  svg.appendChild(path);
-
-  if (Array.isArray(impassable)) {
-    impassable.forEach(side => {
-      const a = corners[(side - 1 + 6) % 6];
-      const b = corners[side % 6];
-      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-      line.setAttribute('x1', a.x);
-      line.setAttribute('y1', a.y);
-      line.setAttribute('x2', b.x);
-      line.setAttribute('y2', b.y);
-      line.setAttribute('stroke', 'red');
-      line.setAttribute('stroke-width', '3');
-      svg.appendChild(line);
-    });
-  }
-
-  const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-  text.setAttribute('x', px);
-  text.setAttribute('y', py + 4);
-  text.setAttribute('fill', 'white');
-  text.setAttribute('font-size', '10');
-  text.setAttribute('text-anchor', 'middle');
-  text.textContent = label;
-  svg.appendChild(text);
-}
-
-async function loadMap() {
-  const svg = document.getElementById('hexmap');
-  while (svg.firstChild) svg.removeChild(svg.firstChild);
-
-  try {
-    const rawTiles = await fetchMapTiles();
-    rawTiles.forEach(raw => {
-      const tile = {
-        x:          raw.x,
-        y:          raw.y,
-        label:      raw.label,
-        terrain:    raw.terrain_type?.name ?? 'Plains',
-        impassable: raw.impassable_sides ?? []
-      };
-      drawHex(tile, svg);
-    });
-  } catch (err) {
-    console.error('Error loading map data:', err);
-    const errorText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    errorText.setAttribute('x', 20);
-    errorText.setAttribute('y', 20);
-    errorText.setAttribute('fill', 'red');
-    errorText.textContent = 'Failed to load map.';
-    svg.appendChild(errorText);
-  }
-}
-
-loadMap();
+   /* ========== CONFIG ==========
+      Tweak these to fit your design
+      --------------------------- */
+   const HEX_SIZE        = 50;          // px, width tip‑to‑tip
+   const HEX_GAP         = 4;           // px, gap between hexes
+   const TERRAIN_COLORS  = {            // fallback demo palette
+     plains:  '#b5d99c',
+     forest:  '#6fbf73',
+     mountain:'#9b9b9b',
+     water:   '#6fa8dc',
+     desert:  '#e8d28b',
+     default: '#ddd'
+   };
+   
+   /* ========== DOM ========== */
+   const container = document.getElementById('map-container'); // <div> in mapScreen.html
+   if (!container) {
+     throw new Error(
+       `[mapScreen] Missing <div id="map-container"> in mapScreen.html`
+     );
+   }
+   
+   /* ========== LOAD & RENDER ========== */
+   (async function init() {
+     const gameId = getCurrentGameId();
+     if (!gameId) {
+       alert('No gameId found in URL or localStorage');
+       return;
+     }
+   
+     try {
+       const tiles = await fetchMapTiles(gameId);
+       renderMap(tiles);
+     } catch (err) {
+       /* eslint-disable-next-line no-console */
+       console.error(err);
+       alert('Could not load map tiles. Check console for details.');
+     }
+   })();
+   
+   /* ---------------------------------- */
+   function getCurrentGameId() {
+     const urlParam = new URLSearchParams(window.location.search).get('gameId');
+     return urlParam || localStorage.getItem('currentGameId');
+   }
+   
+   /* ---------------------------------- */
+   function renderMap(tiles) {
+     container.innerHTML = '';                     // clear old content
+     tiles.forEach(tile => container.append(hexForTile(tile)));
+   
+     // Resize container bounds so scrollbars fit map size
+     const { maxQ, maxR } = tiles.reduce(
+       (acc, t) => ({
+         maxQ: Math.max(acc.maxQ, t.q ?? 0),
+         maxR: Math.max(acc.maxR, t.r ?? 0)
+       }),
+       { maxQ: 0, maxR: 0 }
+     );
+   
+     const width  = (HEX_SIZE + HEX_GAP) * (maxQ + 2);
+     const height = (HEX_SIZE * 0.75 + HEX_GAP) * (maxR + 3);
+     container.style.width  = `${width}px`;
+     container.style.height = `${height}px`;
+   }
+   
+   /* ---------------------------------- */
+   function hexForTile(tile) {
+     /* Expected fields coming from /api/tiles:
+          tile.territory_id  – uuid
+          tile.label         – "E3", "Winterfell", etc.
+          tile.q / tile.r    – axial coords   (add in DB or compute client‑side)
+          tile.terrain_name  – join with terrain_type if you like
+     */
+     const { q = 0, r = 0, label, terrain_name } = tile;
+   
+     // axial‑to‑pixel   (point‑top orientation)
+     const x = (HEX_SIZE + HEX_GAP) * (q + r / 2);
+     const y = (HEX_SIZE * 0.75 + HEX_GAP) * r;
+   
+     // build DOM
+     const div = document.createElement('div');
+     div.className = 'hex';
+     div.textContent = label ?? '';          // show label in centre
+     div.style.background =
+       TERRAIN_COLORS[terrain_name] ?? TERRAIN_COLORS.default;
+     div.style.width  = `${HEX_SIZE}px`;
+     div.style.height = `${HEX_SIZE}px`;
+     div.style.left   = `${x}px`;
+     div.style.top    = `${y}px`;
+   
+     // click‑for‑details (stub)
+     div.addEventListener('click', () => {
+       alert(
+         `Territory: ${label}\n` +
+         `Terrain:   ${terrain_name ?? 'unknown'}\n` +
+         `Coords:    q=${q}, r=${r}`
+       );
+     });
+   
+     return div;
+   }
+   
