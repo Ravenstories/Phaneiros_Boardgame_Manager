@@ -1,60 +1,50 @@
-// Function to load components dynamically into the #app container
-export function loadComponent(componentName) {
-    const appContainer = document.getElementById('app');
-    
-    // Define the file paths for the component HTML and its corresponding JS
-    let componentHTMLPath = '';
-    let componentJSPath = '';
-    
-    switch (componentName) {
-        case 'start':
-            componentHTMLPath       = 'frontend/pages/Start/start.html';
-            componentJSPath         = 'frontend/pages/Start/start.js';
-            break;
-        case 'kingdomCreation':
-            componentHTMLPath       = 'frontend/pages/KingdomCreationScreen/kingdomCreationScreen.html';
-            componentJSPath         = 'frontend/pages/KingdomCreationScreen/kingdomCreationScreen.js';
-            break;
-        case 'kingdomOverview':
-            componentHTMLPath       = 'frontend/pages/KingdomOverviewScreen/kingdomOverviewScreen.html';
-            componentJSPath         = 'frontend/pages/KingdomOverviewScreen/kingdomOverviewScreen.js';
-            break;
-        case 'mapScreen':
-            componentHTMLPath       = 'frontend/pages/MapScreen/mapScreen.html';
-            componentJSPath         = 'frontend/pages/MapScreen/mapScreen.js';
-            break;
-        default:
-            componentHTMLPath       = 'frontend/pages/Start/start.html';
-            componentJSPath         = 'frontend/pages/Start/start.js';
+// frontend/js/loadComponents.js
+export async function loadComponent(componentName) {
+    const app = document.getElementById('app');
+  
+    // Resolve paths (absolute keeps it simple)
+    const base = '/frontend/pages';
+    const routes = {
+      start:             `${base}/Start/start`,
+      kingdomCreation:   `${base}/KingdomCreationScreen/kingdomCreationScreen`,
+      kingdomOverview:   `${base}/KingdomOverviewScreen/kingdomOverviewScreen`,
+      mapScreen:         `${base}/MapScreen/mapScreen`
+    };
+    const path = routes[componentName] || routes.start;
+  
+    try {
+      /* ---------- fetch & parse HTML ---------- */
+      const htmlText = await fetch(`${path}.html`).then(r => r.text());
+      const doc      = new DOMParser().parseFromString(htmlText, 'text/html');
+  
+      // ♻️ inject only #page-content children
+      const fragment = doc.querySelector('#page-content');
+      if (!fragment) throw new Error('Missing #page-content wrapper');
+      app.innerHTML = fragment.innerHTML;
+  
+      /* ---------- load corresponding JS ---------- */
+      await loadScript(`${path}.js`);
+    } catch (err) {
+      console.error(err);
+      app.innerHTML = '<p>Error loading content.</p>';
     }
-
-    // Fetch the component HTML and inject it into the app container
-    fetch(componentHTMLPath)
-        .then(response => response.text())
-        .then(data => {
-            appContainer.innerHTML = data;  // Inject the HTML into the app container
-
-            // Now that the HTML is loaded, dynamically load the corresponding JS
-            loadScript(componentJSPath);
-        })
-        .catch(error => {
-            console.error('Error loading component:', error);
-            appContainer.innerHTML = '<p>Error loading content. Please try again later.</p>';
-        });
-}
-
-// Function to dynamically load a script
-function loadScript(scriptPath) {
-    const script = document.createElement('script');
-    script.src = scriptPath;
-    script.type = 'module';
-    script.defer = true;
-    document.body.appendChild(script);  // Add the script to the body
-}
-
-window.loadComponent = loadComponent;
-
-// Load the default component (start) on page load
-document.addEventListener('DOMContentLoaded', () => {
-    loadComponent('start');  // Load the start component by default
-});
+  }
+  
+  /* helper – returns a Promise that resolves when script is loaded */
+  function loadScript(src) {
+    return new Promise((res, rej) => {
+      const s = Object.assign(document.createElement('script'), {
+        src,
+        type: 'module',
+        onload: res,
+        onerror: rej
+      });
+      document.body.append(s);
+    });
+  }
+  
+  window.loadComponent = loadComponent;
+  
+  /* boot screen */
+  document.addEventListener('DOMContentLoaded', () => loadComponent('start'));
+  

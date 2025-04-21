@@ -1,0 +1,22 @@
+#map-container {
+    position: relative;
+    overflow: auto;
+    border: 1px solid #999;
+    aspect-ratio: 16 / 9;   
+}
+
+.hex {
+    position: absolute;
+    clip-path: polygon(
+        25% 5%,  75% 5%,
+        100% 50%, 75% 95%,
+        25% 95%, 0 50%
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    color: #333;
+    user-select: none;
+    cursor: pointer;
+}

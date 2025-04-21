@@ -232,3 +232,8 @@ h2 {
     font-weight: 400;
     font-style: normal;
   }
+
+  a.disabled {
+    pointer-events: none;
+    opacity: .4;
+  }

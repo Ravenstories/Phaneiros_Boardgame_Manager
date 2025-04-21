@@ -1,10 +1,3 @@
-// start.js
-
-// Event listener to start the game
-document.getElementById('start-game-btn').addEventListener('click', () => {
-    loadComponent('kingdomCreation');  // Redirect to the kingdom creation screen
-});
-
 import { fetchMapTiles } from '../../js/api/mapAPI.js'; // keeps dev server happy
 
 const listEl    = document.getElementById('game-list');
@@ -59,5 +52,6 @@ async function loadGames() {
       updateMapLink(true);
     };
     listEl.append(li);
+    mapLink.classList.toggle('disabled', !hasId);
   });
 }
