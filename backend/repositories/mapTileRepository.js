@@ -5,14 +5,19 @@ import { supabase } from '../supabaseClient.js';
  */
 export async function getAllTiles() {
   const { data, error } = await supabase.from('territory').select(`
-      territory_id   ,
-      game_id        ,
-      label          ,
-      size           ,
-      terrain_type_id,
-      created_at
+    territory_id,
+    game_id,
+    label,
+    size,
+    terrain_type_id,
+    q,
+    r,
+    x,
+    y,
+    impassable_sides,
+    created_at
   `);
-
+  console.log("getAllTiles", data, error);  
   if (error) throw new Error(error.message);
   return data;          // array of rows
 }
