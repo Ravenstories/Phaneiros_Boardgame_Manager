@@ -237,3 +237,13 @@ h2 {
     pointer-events: none;
     opacity: .4;
   }
+
+  #map-container {
+    margin: 24px auto;      /* centres the white panel horizontally */
+    background: #fff;
+    border-radius: 8px;
+    overflow: auto;         /* scroll if map is larger than panel */
+    box-shadow: 0 4px 20px rgba(0,0,0,.35);
+    padding: 16px;          /* room for drop‑shadows on edge hexes */
+  }
+  

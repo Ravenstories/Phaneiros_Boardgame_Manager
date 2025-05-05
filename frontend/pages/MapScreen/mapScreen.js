@@ -1,141 +1,114 @@
-// Refactored mapScreen.js — now anchors map at (0,0) so every tile is visible
-// ================================================================
-// 2025‑04‑24 (v2)
-// • Two‑pass build: compute pixel bounds, then offset all tiles so the
-//   smallest x/y start at 0,0 (no more "everything in the corner")
-// • Keeps the fast DocumentFragment rendering & helper exports
-// • No API changes for callers
+/******************************************************************************
+ * MapScreen – renders a point‑top hex map using axial coords in x / y.
+ ******************************************************************************/
 
-import { fetchMapTiles } from "../../js/api/mapAPI.js";
+import { fetchMapTiles } from '../../js/api/mapAPI.js';
 
-/* ------------------------------------------------------------------
-  CONFIG
------------------------------------------------------------------- */
-const HEX_SIZE = 50;                    // tip‑to‑tip width  (px)
-const HEX_GAP  = 4;                     // gap between tiles (px)
+/* ───────────── CONFIG ───────────── */
+const HEX_SIZE   = 50;                 // px – tip‑to‑tip width
+const HEX_GAP    = 4;                  // px – gap between hexes
+const HEX_HEIGHT = HEX_SIZE * Math.sqrt(3) / 2;   // point‑top height
 
 const TERRAIN_COLORS = {
-  plains:   "#b5d99c",
-  forest:   "#6fbf73",
-  mountain: "#9b9b9b",
-  water:    "#6fa8dc",
-  desert:   "#e8d28b",
-  default:  "#dddddd",
+  plains   : '#b5d99c',
+  forest   : '#6fbf73',
+  mountain : '#9b9b9b',
+  water    : '#6fa8dc',
+  desert   : '#e8d28b',
+  default  : '#dddddd',
 };
 
-/* Derived metrics (point‑top orientation) */
-const HEX_WIDTH  = HEX_SIZE;
-const HEX_HEIGHT = (Math.sqrt(3) / 2) * HEX_SIZE;
-const VERT_SPACING = 0.75 * HEX_SIZE;          // vertical step between rows
+/* ───── DOM GUARD ───── */
+const container = document.getElementById('map-container');
+if (!container) throw new Error('[MapScreen] <div id="map-container"> missing');
+container.style.position = 'relative';
 
-/* ------------------------------------------------------------------ */
-const $container = document.getElementById("map-container");
-if (!$container) throw new Error("[mapScreen] Missing <div id='map-container'>");
-$container.style.position = "relative";        // ensure children are absolutely positioned
-
-init().catch(console.error);
-
-/* ------------------------------------------------------------------
-  MAIN
------------------------------------------------------------------- */
-async function init() {
+/* ───── BOOTSTRAP ───── */
+(async function init () {
   const gameId = getCurrentGameId();
-  if (!gameId) return alert("No game selected – missing gameId param or localStorage entry");
+  if (!gameId) { alert('No gameId in URL/localStorage'); return; }
 
-  const tiles = await fetchMapTiles(gameId);
-  if (!Array.isArray(tiles) || !tiles.length) return alert("No tiles returned for this game.");
+  try {
+    const tiles = await fetchMapTiles(gameId);
+    renderMap(tiles);
+  } catch (err) {
+    console.error(err);
+    alert('Could not load map tiles. Check console for details.');
+  }
+})();
 
-  const built = preprocessTiles(tiles);           // adds pixel coords & tracks bounds
-  renderTiles(built.tiles, built.bounds);
+/* ───── HELPERS ───── */
+function getCurrentGameId () {
+  const urlId = new URLSearchParams(window.location.search).get('gameId');
+  return urlId || localStorage.getItem('currentGameId');
 }
 
-/* ------------------------------------------------------------------
-  HELPERS
------------------------------------------------------------------- */
-function getCurrentGameId() {
-  return new URLSearchParams(location.search).get("gameId") || localStorage.getItem("currentGameId");
+/** axial → pixel (point‑top) */
+function axialToPixel (q, r) {
+  const x = (HEX_SIZE + HEX_GAP) * (q + r / 2);
+  const y = (HEX_HEIGHT + HEX_GAP) * r;
+  return { x, y };
 }
 
-function axialToPixel(q, r) {
-  return {
-    x: HEX_WIDTH * (q + r / 2) + HEX_GAP * q,
-    y: VERT_SPACING * r + HEX_GAP * r,
-  };
-}
+/* ───── RENDER ───── */
+function renderMap (tiles) {
+  console.log('renderMap', tiles);
+  container.textContent = '';            // clear old map
+  const frag = document.createDocumentFragment();
 
-function deriveCoords(label = "") {
-  const m = /^([A-Za-z]+)(\d+)$/.exec(label.trim());
-  if (!m) return { q: 0, r: 0 };
-  const letters = m[1].toUpperCase();
-  let r = 0;
-  for (let i = 0; i < letters.length; i++) r = r * 26 + (letters.charCodeAt(i) - 64);
-  r -= 1; // zero‑based
-  return { q: Number(m[2]), r };
-}
+  let minX = Infinity, minY = Infinity,
+      maxX = -Infinity, maxY = -Infinity;
 
-/**
- * First pass: enrich each tile with pixel coords and compute min/max bounds.
- */
-function preprocessTiles(tiles) {
-  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-
-  const enriched = tiles.map(t => {
-    const { q: rawQ, r: rawR } = t;
-    const { q, r } = rawQ == null || rawR == null ? deriveCoords(t.label) : { q: rawQ, r: rawR };
+  for (const t of tiles) {
+    const q = t.x;
+    const r = t.y;
     const { x, y } = axialToPixel(q, r);
+
+    // friendly terrain string (depends on how you joined it in the API)
+    const terrain = t.terrain_type?.name || t.terrain_name || 'plains';
 
     minX = Math.min(minX, x);
     minY = Math.min(minY, y);
     maxX = Math.max(maxX, x);
     maxY = Math.max(maxY, y);
 
-    return { ...t, q, r, x, y };
-  });
-
-  return { tiles: enriched, bounds: { minX, minY, maxX, maxY } };
-}
-
-function renderTiles(tiles, bounds) {
-  const frag = new DocumentFragment();
-  const offsetX = -bounds.minX + HEX_GAP;   // add a little padding
-  const offsetY = -bounds.minY + HEX_GAP;
-
-  for (const t of tiles) {
-    const div = document.createElement("div");
-    div.className = "hex";
-    div.textContent = t.label ?? "";
-
-    div.style.cssText = `
-      position:absolute;
-      width:${HEX_SIZE}px;height:${HEX_HEIGHT}px;
-      left:${t.x + offsetX}px;
-      top:${t.y + offsetY}px;
-      line‑height:${HEX_HEIGHT}px;
-      background:${TERRAIN_COLORS[t.terrain_name] ?? TERRAIN_COLORS.default};
-      clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
-      user-select:none;
-    `;
-
-    div.addEventListener("click", () => showTileInfo(t));
-    frag.append(div);
+    frag.appendChild(buildHex(t, x, y, terrain));
   }
 
-  $container.replaceChildren(frag);
-  resizeContainer(bounds, offsetX, offsetY);
+  // offset so smallest hex lands at (0,0)
+  const offsetX = -minX + HEX_GAP;
+  const offsetY = -minY + HEX_GAP;
+  for (const el of frag.children) {
+    el.style.left = `${+el.dataset.x + offsetX}px`;
+    el.style.top  = `${+el.dataset.y + offsetY}px`;
+  }
+
+  container.style.width  = `${maxX - minX + HEX_SIZE   + HEX_GAP * 2}px`;
+  container.style.height = `${maxY - minY + HEX_HEIGHT + HEX_GAP * 2}px`;
+
+  container.appendChild(frag);
 }
 
-function resizeContainer({ maxX, maxY, minX, minY }, offsetX, offsetY) {
-  const width  = maxX - minX + HEX_SIZE + offsetX + HEX_GAP;
-  const height = maxY - minY + HEX_HEIGHT + offsetY + HEX_GAP;
-  $container.style.width  = `${width}px`;
-  $container.style.height = `${height}px`;
+/* build one <div class="hex"> */
+function buildHex (tile, pixelX, pixelY, terrain) {
+  const div = document.createElement('div');
+  div.className = `hex hex--${terrain}`;
+  div.textContent = tile.label || '';
+  div.style.cssText = `
+    position:absolute;
+    width:${HEX_SIZE}px;
+    height:${HEX_HEIGHT}px;
+    background:${TERRAIN_COLORS[terrain] || TERRAIN_COLORS.default};
+    clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0 75%,0 25%);
+  `;
+  div.dataset.x = pixelX;
+  div.dataset.y = pixelY;
+
+  div.addEventListener('click', () => {
+    alert(`Territory: ${tile.label}\nTerrain: ${terrain}\nAxial: ${tile.x}, ${tile.y}`);
+  });
+  return div;
 }
 
-function showTileInfo(t) {
-  alert(`Territory: ${t.label}\nTerrain: ${t.terrain_name ?? "unknown"}\nCoords: q=${t.q}, r=${t.r}`);
-}
-
-/* ------------------------------------------------------------------
-  TEST HOOKS
------------------------------------------------------------------- */
-export const _internal = { axialToPixel, deriveCoords, preprocessTiles };
+/* expose util for tests */
+export const _internal = { axialToPixel };

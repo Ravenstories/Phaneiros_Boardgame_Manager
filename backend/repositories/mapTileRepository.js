@@ -4,20 +4,8 @@ import { supabase } from '../supabaseClient.js';
  * Get **all** territories (aka map tiles).
  */
 export async function getAllTiles() {
-  const { data, error } = await supabase.from('territory').select(`
-    territory_id,
-    game_id,
-    label,
-    size,
-    terrain_type_id,
-    q,
-    r,
-    x,
-    y,
-    impassable_sides,
-    created_at
-  `);
-  console.log("getAllTiles", data, error);  
+  const { data, error } = await supabase.from('territory').select(`*`);
+  //console.log("getAllTiles", data, error);  
   if (error) throw new Error(error.message);
   return data;          // array of rows
 }
@@ -35,3 +23,21 @@ export async function getTileById(id) {
   if (error && error.code !== 'PGRST116') throw new Error(error.message);
   return data ?? null;
 }
+
+
+/* selectors for getAllTiles() 
+    territory_id,
+    game_id,
+    label,
+    size,
+    terrain_type_id,
+    x,
+    y,
+    impassable_sides,
+    created_at,
+    terrain_type (
+      terrain_type_id,
+      name,
+      color,
+      icon
+      */
