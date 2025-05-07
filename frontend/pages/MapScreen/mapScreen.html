@@ -1,14 +1,10 @@
-<!-- 1) PAGE WRAPPER keeps everything centred -->
+<main id="page-content"> 
 
-<div id="page-content" class="page-wrapper">
-
-  <!-- 2) MAP CARD is the white panel -->
-  <div id="map-card">
-    <!-- 3) MAP BOARD is where we append tiles & handle drag -->
-    <div id="map-board"></div>
+  <div id="map-wrapper">
+    <div id="map-board"></div><!-- JS injects tiles here -->
   </div>
+  
+  <!-- floating side-panel lives outside page-content so we keep it here -->
+  <aside id="tile-info"></aside>
 
-  <!-- 4) INFO PANEL (outside card so it can float) -->
-  <div id="tile-info"></div>
-</div>
-
+</main>

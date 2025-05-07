@@ -1,114 +1,26 @@
-/* ───── HEX baseline ───── 
-.hex {
-  position: absolute;                /* set from JS 
-  width: 50px;                       /* matches HEX_SIZE in JS 
-  height: 43.3px;                    /* ≈ √3/2 × 50 
-  clip-path: polygon(50% 0%,100% 25%,100% 75%,50% 100%,0 75%,0 25%);
-  background: var(--fill, #b5d99c);
-  border: 1px solid rgba(0,0,0,.25);
-  box-sizing: border-box;
-  font: 600 11px/43px "Cinzel", serif;
-  text-align: center;
-  color: #222;
-  user-select: none;
 
-  transition: transform .12s ease,
-              box-shadow .12s ease,
-              outline .12s ease;
-  outline: 0 solid transparent;
-}
-
-/* Hover lift + outline 
-.hex:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,.35);
-  outline: 2px solid #fff;
-  z-index: 20;
-}
-
-/* Terrain colours (override with inline var(--fill) if needed) 
-.hex--plains   { --fill:#b5d99c; }
-.hex--forest   { --fill:#6fbf73; }
-.hex--mountain { --fill:#9b9b9b; }
-.hex--water    { --fill:#6fa8dc; }
-.hex--desert   { --fill:#e8d28b; }
-
-/* Hide label unless hovered (toggle via JS if you want) 
-.hex > span { opacity: 0; transition: opacity .1s ease; }
-.hex:hover  > span { opacity: 1; }
-.show-labels .hex > span { opacity: 1 !important; }
-
-/* ───── Map container ───── 
-/* map container card 
-#map-container {
-  /* NEW → either take the whole width or stop at 1200 px 
-  width: 100%;
-  max-width: 1200px;          /* tweak or remove if you want full-bleed 
-  height: auto;               /* JS still sets the precise pixel height 
-  margin: 32px auto;          /* vert spacing + centre horizontally 
-
-  background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0,0,0,.25);
-  overflow: auto;
-  cursor: grab;
-
-  /* nice subtle border so it reads like a panel 
-  border: 1px solid rgba(0,0,0,.05);
-}
-
-#map-container > .map-inner {
-  position: relative;
-  margin: 0 auto;             /* centres inner board horizontally 
-}
-
-
-/* ───── Side info panel ───── 
-#tile-info {
-  position: fixed; right: 32px; top: 96px;
-  width: 240px; max-height: 60vh;
-  background: #fff;
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0,0,0,.35);
-  padding: 12px 16px;
-  overflow-y: auto;
-  display: none;
-}
-
-/* Show when tile info is available 
-#tile-info.show {
-  display: block;
-}
-*/
-
-
-
-
-
-
-
-/* ─────────  PAGE LAYOUT  ───────── */
-.page-wrapper {
-  max-width: 1200px;      /* adjust to match site grid */
-  margin: 0 auto;         /* horizontal centre */
-  padding: 32px 24px;     /* top-bottom & side gutters */
-}
-
-/* ─────────  MAP CARD  ───────── */
-#map-card {
+/* ─────────  MAP PAGE  ───────── */
+/*  the host element: your layout already provides <div id="page-content">  */
+#page-content {
+  width: auto;             /* align with other pages */
+  margin: 32px auto;             /* vertical space & centred */
   background: #fff;
   border: 1px solid rgba(0,0,0,.05);
   border-radius: 8px;
   box-shadow: 0 4px 20px rgba(0,0,0,.25);
-  padding: 16px;                  /* space around board */
+  padding: 16px;                 /* room for hex lift on hover */
 }
 
-/* ─────────  MAP BOARD  ───────── */
+/* wrapper so board can size, but you could target #page-content directly */
+#map-wrapper { position: relative; }
+
+/* BOARD ------------------------------------------------------------ */
 #map-board {
-  position: relative;             /* anchor abs-pos hexes */
-  overflow: auto;                 /* internal scroll if big */
-  cursor: grab;                   /* works with drag code */
+  position: relative;            /* anchor abs-pos hexes */
+  overflow: auto;                /* internal scroll */
+  cursor: grab;
 }
+
 
 /* ─────────  INFO PANEL  ───────── */
 #tile-info {
