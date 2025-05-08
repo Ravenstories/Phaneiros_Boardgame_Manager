@@ -2,21 +2,14 @@
 /* ─────────  MAP PAGE  ───────── */
 /*  the host element: your layout already provides <div id="page-content">  */
 #page-content {
-<<<<<<< HEAD
-  width: auto;             /* align with other pages */
-  margin: 32px auto;             /* vertical space & centred */
-=======
->>>>>>> 2c9a145e76bcff408776dbb501dac16c21cff9be
+  width: auto;                          /* align with other pages */
+  overflow-x: auto;
+  margin: 32px auto;                    /* vertical space & centred */
   background: #fff;
   border: 1px solid rgba(0,0,0,.05);
   border-radius: 8px;
   box-shadow: 0 4px 20px rgba(0,0,0,.25);
-  padding: 16px;                 /* room for hex lift on hover */
-<<<<<<< HEAD
-=======
-  max-width: 1200px;             /* align with other pages */
-  margin: 32px auto;             /* vertical space & centred */
->>>>>>> 2c9a145e76bcff408776dbb501dac16c21cff9be
+  padding: 16px;                        /* room for hex lift on hover */
 }
 
 /* wrapper so board can size, but you could target #page-content directly */

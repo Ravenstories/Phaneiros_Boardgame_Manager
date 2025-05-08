@@ -83,12 +83,6 @@ function renderMap (tiles) {
 
   // 3) build hexes using the pre-computed offset
   for (const t of tiles) {
-    /*
-    const base = toPixel(t.x, t.y);
-    const px   = base.x + offsetX;
-    const py   = base.y + offsetY;
-    frag.appendChild(buildHex(t, px, py));
-    */
     const base = toPixel(t.x, t.y);
     frag.appendChild(buildHex(t, base.x + offsetX, base.y + offsetY));
   }

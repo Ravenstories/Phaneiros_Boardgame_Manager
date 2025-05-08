@@ -66,6 +66,28 @@ main {
 
 }
 
+/* ───────── SITE GRID WRAPPER ─────────
+   The loader places each screen inside #app-container. */
+   #app-container {
+    max-width: 1200px;       /* global grid width */
+    margin: 0 auto;
+    padding: 32px 24px;      /* top-bottom & side gutters */
+    min-height: calc(100vh - 80px); /* leave room for nav bar height */
+    display: flex;
+    flex-direction: column;
+    gap: 32px;               /* space between stacked “cards” */
+  }
+  
+  /* every screen can insert <section class="card"> ... </section>
+     to get a styled white panel. */
+  .card {
+    background: #fff;
+    border: 1px solid rgba(0,0,0,.05);
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.25);
+    padding: 16px;
+  }
+  
 /* The content inside the #app */
 #app {
     display: flex;
@@ -238,12 +260,5 @@ h2 {
     opacity: .4;
   }
 
-  #map-container {
-    margin: 24px auto;      /* centres the white panel horizontally */
-    background: #fff;
-    border-radius: 8px;
-    overflow: auto;         /* scroll if map is larger than panel */
-    box-shadow: 0 4px 20px rgba(0,0,0,.35);
-    padding: 16px;          /* room for drop‑shadows on edge hexes */
-  }
+
   
