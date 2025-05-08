@@ -1,27 +1,28 @@
 
-/* ─────────  MAP PAGE  ───────── */
-/*  the host element: your layout already provides <div id="page-content">  */
+/* ─────────  MAP PAGE  ───────── 
+
 #page-content {
-  width: auto;                          /* align with other pages */
+  width: auto;                          
   overflow-x: auto;
-  margin: 32px auto;                    /* vertical space & centred */
+  margin: 32px auto;                    
   background: #fff;
   border: 1px solid rgba(0,0,0,.05);
   border-radius: 8px;
   box-shadow: 0 4px 20px rgba(0,0,0,.25);
-  padding: 16px;                        /* room for hex lift on hover */
+  padding: 16px;                        
 }
 
-/* wrapper so board can size, but you could target #page-content directly */
+/* wrapper so board can size, but you could target #page-content directly 
 #map-wrapper { position: relative; }
 
-/* BOARD ------------------------------------------------------------ */
+/* BOARD ------------------------------------------------------------ 
 #map-board {
-  position: relative;            /* anchor abs-pos hexes */
-  overflow: auto;                /* internal scroll */
+  position: relative;            
+  overflow: auto;                
   cursor: grab;
 }
 
+*/
 
 /* ─────────  INFO PANEL  ───────── */
 #tile-info {
@@ -60,7 +61,11 @@
   z-index: 20;
 }
 
-.hex > span { opacity: 0; }
+.hex > span { 
+  opacity: 0;
+  color: #203010;
+  font-weight: 600; 
+}
 .hex:hover > span { opacity: 1; }
 .show-labels .hex > span { opacity: 1 !important; }
 
@@ -69,3 +74,27 @@
 .hex--mountain { --fill:#9b9b9b; }
 .hex--water    { --fill:#6fa8dc; }
 .hex--desert   { --fill:#e8d28b; }
+
+/* full-viewport flex centering */
+.map-page {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;   /* top-align vs center-vertical */
+  padding: 48px 0;           /* top breathing room */
+}
+
+/* white card that auto-grows */
+.map-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 6px 24px rgba(0,0,0,.35);
+  padding: 24px;
+  overflow: auto;            /* scroll if board exceeds viewport */
+  max-width: 90vw;           /* don’t explode on ultrawide screens */
+  max-height: 75vh;
+}
+
+/* let JS keep setting width/height of #map-container */
+#map-container {
+  position: relative;        /* JS already depends on this */
+}

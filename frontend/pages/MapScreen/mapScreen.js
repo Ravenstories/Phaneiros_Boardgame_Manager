@@ -5,7 +5,7 @@
 import { fetchMapTiles } from '../../js/api/mapAPI.js';
 
 /* CONFIG ------------------------------------------------------------------ */
-const HEX_SIZE   = 50;
+const HEX_SIZE   = 60;
 const HEX_GAP    = 4;
 const HEX_HEIGHT = HEX_SIZE * Math.sqrt(3) / 2;
 const COLORS = {
@@ -121,11 +121,11 @@ function showInfo(tile,terrain){
     <p><strong>Coords:</strong> ${tile.x}, ${tile.y}</p>`;
   info.style.display='block';
 }
+
+/* BUTTONS ------------------------------------------------- */
 window.addEventListener('keydown',e=>{
   if(e.key==='Escape') info.style.display='none';
 });
-
-/* Alt reveals all labels */
 window.addEventListener('keydown',e=>{
   if(e.altKey) board.classList.add('show-labels');
 });
