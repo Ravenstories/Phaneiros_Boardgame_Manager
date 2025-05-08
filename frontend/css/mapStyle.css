@@ -1,28 +1,4 @@
 
-/* ─────────  MAP PAGE  ───────── 
-
-#page-content {
-  width: auto;                          
-  overflow-x: auto;
-  margin: 32px auto;                    
-  background: #fff;
-  border: 1px solid rgba(0,0,0,.05);
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0,0,0,.25);
-  padding: 16px;                        
-}
-
-/* wrapper so board can size, but you could target #page-content directly 
-#map-wrapper { position: relative; }
-
-/* BOARD ------------------------------------------------------------ 
-#map-board {
-  position: relative;            
-  overflow: auto;                
-  cursor: grab;
-}
-
-*/
 
 /* ─────────  INFO PANEL  ───────── */
 #tile-info {
@@ -75,13 +51,7 @@
 .hex--water    { --fill:#6fa8dc; }
 .hex--desert   { --fill:#e8d28b; }
 
-/* full-viewport flex centering */
-.map-page {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;   /* top-align vs center-vertical */
-  padding: 48px 0;           /* top breathing room */
-}
+
 
 /* white card that auto-grows */
 .map-card {
@@ -98,3 +68,32 @@
 #map-container {
   position: relative;        /* JS already depends on this */
 }
+
+/* keep navbar at the top, map fills the rest */
+header { flex: 0 0 auto; }
+.map-page { flex: 1 1 auto; }
+
+/* map-page centres the card horizontally */
+.map-page {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;   /* top aligned = nicer UX */
+  padding: 48px 16px;
+}
+
+/* card auto-grows and never exceeds viewport */
+.map-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 6px 24px rgba(0,0,0,.35);
+  padding: 24px;
+  overflow: auto;
+  max-width: 96vw;           /* margins on narrow devices */
+  max-height: calc(100vh - 160px);  /* 48 top pad + 24 card pad + footer? */
+}
+
+/* map container inherits size from JS but never overflows card padding */
+#map-container { position: relative; }
+
+/* optional: grab cursor while panning */
+#map-container.grabbing { cursor: grabbing; }
