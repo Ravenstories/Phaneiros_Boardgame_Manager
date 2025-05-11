@@ -81,6 +81,12 @@ html, body {
   }
   #start-game-btn:hover { background: #45a049; }
   
+  .error-loading-content {
+    color: #ff0000;
+    font-size: 18px;
+    text-align: center;
+  }
+
   /* ───────── KINGDOM DASHBOARD ───────── */
   .kingdom-dashboard {
     background: #1d5b91;
@@ -122,5 +128,6 @@ html, body {
     .kingdom-dashboard { grid-template-columns: 1fr; }
   }
   
+
 
 

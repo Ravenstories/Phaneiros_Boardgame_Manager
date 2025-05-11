@@ -41,7 +41,7 @@ export async function loadComponent(name = 'start') {
     pushHistory(name);
   } catch (err) {
     console.error('[loadComponents] failed:', err);
-    APP_EL.innerHTML = '<p style="text-align:center;margin-top:3rem">Error loading content.</p>';
+    APP_EL.innerHTML = '<p class="error-loading-content">Error loading content.</p>';
   }
 }
 

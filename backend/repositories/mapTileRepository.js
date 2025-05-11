@@ -1,14 +1,5 @@
 import { supabase } from '../supabaseClient.js';
-
-/**
- * Get **all** territories (aka map tiles).
- */
-export async function getAllTiles() {
-  const { data, error } = await supabase.from('territory').select(`*`);
-  //console.log("getAllTiles", data, error);  
-  if (error) throw new Error(error.message);
-  return data;          // array of rows
-}
+import { sqlHelper } from '../library/sqlHelper.js';
 
 /**
  * Find one tile by its UUID, or return null.
@@ -24,20 +15,16 @@ export async function getTileById(id) {
   return data ?? null;
 }
 
-
-/* selectors for getAllTiles() 
-    territory_id,
-    game_id,
-    label,
-    size,
-    terrain_type_id,
-    x,
-    y,
-    impassable_sides,
-    created_at,
-    terrain_type (
-      terrain_type_id,
-      name,
-      color,
-      icon
-      */
+// Get all tiles for a gameId
+// This is a SQL function that returns a set of rows.
+// It takes a gameId as an argument and returns all tiles for that game.
+const sql = sqlHelper('territory/get_all_tiles.sql');
+const QUERY_ALL_TILES = sqlHelper('territory/get_all_tiles.sql');
+export async function getAllTiles (gameId) {
+  const { data, error } = await supabase.rpc('exec_sql', {
+    sql_text: QUERY_ALL_TILES,
+    params: { gameId }
+  });
+  if (error) throw new Error(error.message);
+  return data;          // array of rows
+}
