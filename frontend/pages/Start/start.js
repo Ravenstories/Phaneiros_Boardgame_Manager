@@ -1,57 +1,80 @@
-import { fetchMapTiles } from '../../js/api/mapAPI.js'; // keeps dev server happy
+/* -------- imports -------- */
+import { GameStorage }       from '../../js/storage.js';          // localStorage helper
+import { renderCurrentGame } from '../../js/currentGameHeader.js'; // fills <div id="current-game">
 
-const listEl    = document.getElementById('game-list');
-const mapLink   = document.getElementById('map-link');
-const newBtn    = document.getElementById('new-game-btn');
+/* -------- DOM handles -------- */
+const listEl  = document.getElementById('game-list');
+const mapLink = document.getElementById('map-link');
+const newBtn  = document.getElementById('new-game-btn');
 
-updateMapLink();          // greyed‑out on load
-loadGames();              // fill list
+/* -------- boot -------- */
+init();
 
-/* ----- create new game ----- */
+async function init() {
+  updateMapLink();          // grey-out on first load if no game saved
+  await loadGames();        // build game list
+  renderCurrentGame();      // show banner if a game was chosen on a prev. visit
+}
+
+/* ------------------------------------------------------------------ */
+/*  CREATE NEW GAME                                                    */
+/* ------------------------------------------------------------------ */
 newBtn.addEventListener('click', async () => {
   try {
-    const res = await fetch('/api/games', {
-      method: 'POST',
+    const res      = await fetch('/api/games', {
+      method : 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ game_type: 'kingdom' })
+      body   : JSON.stringify({ game_type: 'kingdom' })
     });
     const { game_id } = await res.json();
-    localStorage.setItem('currentGameId', game_id);
-    updateMapLink(true);       // enable link
-    loadGames();               // refresh list
+
+    GameStorage.set(game_id);     // remember it
+    updateMapLink(true);
+    await loadGames();            // refresh list
+    renderCurrentGame();          // refresh banner
   } catch (err) {
     console.error(err);
     alert('Could not create game.');
   }
 });
 
-/* ----- helpers ----- */
-function updateMapLink(enabled = false) {
-  const hasId = enabled || !!localStorage.getItem('currentGameId');
-  mapLink.style.pointerEvents = hasId ? 'auto' : 'none';
-  mapLink.style.opacity       = hasId ? '1'   : '.4';
+/* ------------------------------------------------------------------ */
+/*  HELPERS                                                            */
+/* ------------------------------------------------------------------ */
+
+/* enable / disable "Go to map" link */
+function updateMapLink(force = false) {
+  const enabled = force || !!GameStorage.get();
+  mapLink.style.pointerEvents = enabled ? 'auto' : 'none';
+  mapLink.style.opacity       = enabled ? '1'   : '.4';
 }
 
+/* rebuild UL #game-list */
 async function loadGames() {
   const res   = await fetch('/api/games');
   const games = await res.json();
 
-  listEl.innerHTML = '';           // clear list
+  listEl.innerHTML = '';
   if (!games.length) {
     listEl.textContent = '— none yet —';
     return;
   }
 
   games.forEach(g => {
-    const li     = document.createElement('li');
+    const li = document.createElement('li');
+    li.className   = 'game-row';                // useful for CSS/testing
+    li.dataset.id  = g.game_id;                 // store the id
+    li.tabIndex    = 0;                         // keyboard focusable
+    li.style.cursor = 'pointer';
     li.textContent =
       `${new Date(g.created_at).toLocaleDateString()} · ${g.game_type}`;
-    li.style.cursor = 'pointer';
-    li.onclick = () => {
-      localStorage.setItem('currentGameId', g.game_id);
+
+    li.addEventListener('click', () => {
+      GameStorage.set(g.game_id);               // remember choice
       updateMapLink(true);
-    };
+      renderCurrentGame();                      // update header banner
+    });
+
     listEl.append(li);
-    mapLink.classList.toggle('disabled', !hasId);
   });
 }
