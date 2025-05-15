@@ -19,12 +19,16 @@ export async function getTileById(id) {
 // This is a SQL function that returns a set of rows.
 // It takes a gameId as an argument and returns all tiles for that game.
 const sql = sqlHelper('territory/get_all_tiles.sql');
-const QUERY_ALL_TILES = sqlHelper('territory/get_all_tiles.sql');
+const GET_ALL_TILES = sqlHelper('territory/get_all_tiles.sql');
 export async function getAllTiles (gameId) {
+  console.log('getAllTiles', gameId);
   const { data, error } = await supabase.rpc('exec_sql', {
-    sql_text: QUERY_ALL_TILES,
-    params: { gameId }
+    sql_text: GET_ALL_TILES,
+    params: { gameid: gameId },
   });
-  if (error) throw new Error(error.message);
+  if (error) {
+    console.error('[getAllTiles] ►', error.message, error.details || error.detail);
+    throw error;
+  }
   return data;          // array of rows
 }

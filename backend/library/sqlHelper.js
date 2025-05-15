@@ -1,13 +1,15 @@
-import { readFileSync } from 'node:fs';
-import { join, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+// backend/library/sqlHelper.js
+import { readFileSync, existsSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname  = dirname(__filename);
 
-/**
- * Reads an .sql file from backend/sql/… and returns its text.
- * Usage: const query = sql('territory/get_all_tiles.sql');
- */
-export function sqlHelper (relativePath) {
-  return readFileSync(join(__dirname, '..', 'sql', relativePath), 'utf8');
+export function sqlHelper (relPath) {
+  const abs = join(__dirname, '..', 'sql', relPath);
+  if (!existsSync(abs)) {
+    throw new Error(`[sqlHelper] File not found: ${abs}`);
+  }
+  return readFileSync(abs, 'utf8');
 }

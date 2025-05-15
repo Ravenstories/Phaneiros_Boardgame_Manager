@@ -1,3 +1,3 @@
 select *
 from territory
-where game_id = :gameId;
+where game_id = :game_id;
