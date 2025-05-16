@@ -1,3 +1,5 @@
+<!-- ───────────── Sidebar ───────────── 
+
 <main id="page-content" class="card">
     <section id="game-info" class="card">
         <h1>Phaneiros Game Manager</h1>
@@ -8,8 +10,40 @@
         <h3>Saved games</h3>
         <ul id="game-list"></ul>
         
-        <a id="map-link" class="disabled">Go to map</a>
+        <button id="btn-new"      …>＋ New</button>
+        <button id="btn-refresh"  …>⟳ Refresh</button>
+        <button id="btn-delete"   …>🗑 Delete</button>
         
+        <footer class="start-footer">
+            <span id="loaded-indicator" class="loaded-indicator">No game loaded.</span>
+        </footer>
     </section>
 </main>
+-->
   
+
+<!-- ───────────── Sidebar ───────────── -->
+<main id="page-content" class="card">
+  <aside class="sidebar">
+    <header>
+      <h1>Games</h1>
+      <p id="loaded-tag" class="loaded-tag">No game loaded.</p>
+    </header>
+
+    <nav class="btn-group">
+      <button id="btn-new" class="btn btn--primary"   title="Create new">＋ New</button>
+      <button id="btn-refresh" class="btn"            title="Reload list">⟳ Refresh</button>
+      <button id="btn-delete"  class="btn btn--danger"title="Delete loaded" disabled>🗑 Delete</button>
+      <a      id="map-link"    class="btn btn--go" href="/pages/Map/index.html" tabindex="-1">Map →</a>
+    </nav>
+  </aside>
+
+  <!-- ───────────── Main list ──────────── -->
+  <section class="list-panel">
+    <table id="game-table" class="game-table">
+      <thead><tr><th>Created</th><th>Type</th></tr></thead>
+      <tbody><!-- rows injected by JS --></tbody>
+    </table>
+    <p id="empty-msg" class="msg"></p>
+  </section>
+</main>

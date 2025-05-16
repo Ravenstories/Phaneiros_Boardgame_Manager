@@ -137,4 +137,58 @@ html, body {
   border-radius: 6px;
 }
 
+/* e.g. in frontend/css/site.css */
+body.loading::after {
+  content: 'Loading…';
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(255,255,255,.7);
+  font: 1.2rem/1 sans-serif;
+}
+
+:root {
+  --gap: 1rem;
+  --radius: 8px;
+  --dark: #0f2a29;
+  --primary:#2e9d62;
+  --danger:#c44444;
+  --go:#0b5fa4;
+  font-family:'Segoe UI',sans-serif;
+}
+
+/* layout */
+body{margin:0;background:#062222;color:#222;}
+.layout{display:flex;min-height:100vh;}
+.sidebar{width:220px;padding:var(--gap);background:#fff;border-right:1px solid #e3e3e3;display:flex;flex-direction:column;gap:var(--gap);}
+.list-panel{flex:1;padding:var(--gap) calc(var(--gap)*2);display:flex;flex-direction:column;}
+
+@media(max-width:700px){.layout{flex-direction:column}.sidebar{width:auto;border-right:none;border-bottom:1px solid #e3e3e3;}}
+
+/* buttons */
+.btn{padding:.45rem .9rem;border:none;border-radius:var(--radius);cursor:pointer;font:inherit}
+.btn-group{display:flex;flex-wrap:wrap;gap:.5rem}
+.btn--primary{background:var(--primary);color:#fff}
+.btn--danger{background:var(--danger);color:#fff}
+.btn--go{background:var(--go);color:#fff;text-decoration:none}
+.btn:disabled{opacity:.4;cursor:default}
+
+/* loaded tag */
+.loaded-tag{margin:0;font-size:.85rem;font-style:italic;color:#666}
+
+/* table */
+.game-table{width:100%;border-collapse:collapse;font-size:.9rem}
+.game-table thead{background:#fafafa}
+.game-table th,.game-table td{padding:.5rem .6rem;border-bottom:1px solid #eee}
+.game-table tr:hover{background:#eefdf6;cursor:pointer}
+.game-table tr.active{background:#d6faec}
+
+/* messages */
+.msg{margin-top:2rem;text-align:center;color:#777}
+
+/* spinner */
+body.loading::after{
+  content:'Loading…';position:fixed;inset:0;display:grid;place-items:center;
+  background:rgba(255,255,255,.8);font:1.2rem/1 sans-serif;z-index:1000}
 
