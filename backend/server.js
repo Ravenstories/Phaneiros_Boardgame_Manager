@@ -9,7 +9,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 
 // API
-app.use('/api/tiles', tilesRouter);
+app.use('/api', tilesRouter);
 app.use('/api/games', gamesRouter);
 app.use(express.static('frontend')); 
 
