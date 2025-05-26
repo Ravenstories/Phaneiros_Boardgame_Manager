@@ -85,6 +85,7 @@ const toPixel = (q,r) => ({
 
 /* RENDER – place every tile inside #map-board so no negative coords. */
 function renderMap (tiles) {
+  console.log('renderMap', tiles.length);
   board.textContent = '';
   if (!tiles.length) {
     board.innerHTML = '<p class="map-msg">Empty map.</p>';

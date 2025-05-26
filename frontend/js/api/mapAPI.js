@@ -10,5 +10,17 @@ export async function fetchMapTiles(game_id) {
 // Path-param style
 export async function fetchMapTiles(game_id) {
   const r = await fetch(`/api/games/${game_id}/tiles`);
-  return r;
+  console.log('[fetchMapTiles]:', game_id, r);
+  if (!r.ok) throw new Error(`Error fetching tiles: ${r.status}`);
+  return r.json();
 }
+
+/*
+export const fetchMapTiles = game_id =>
+  fetch(`/api/games/${game_id}/tiles`)
+    .then(r=>{
+      if(!r.ok) throw new Error(r.status);
+      return r.json();               // always JSON array
+    }
+  );
+*/
