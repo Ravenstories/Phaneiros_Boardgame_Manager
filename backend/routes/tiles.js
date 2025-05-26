@@ -18,9 +18,19 @@ tilesRouter.get('/games/:game_id/tiles', async (req, res) => {
   }
 });*/
 
-tilesRouter.get('/games/:game_id/tiles', async (req,res,next)=>{
+/* tilesRouter.get('/games/:game_id/tiles', async (req,res,next)=>{
   try{
     const tiles = await MapService.getTilesForGame(req.params.game_id);
     res.json(tiles);                       // <-- always array
   }catch(err){ next(err); }
+}); */
+
+tilesRouter.get('/api/games/:game_id/tiles', async (req, res, next) => {
+  try {
+    const tiles = await MapService.getTilesForGame(req.params.game_id);
+    console.log('[tiles route] hit with', req.params.game_id);
+
+    // cheap ETag = hash of updated_at max
+    res.set('ETag', `"${createHash(tiles)}"`).json(tiles);
+  } catch (e) { next(e); }
 });
