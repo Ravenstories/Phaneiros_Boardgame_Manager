@@ -11,6 +11,7 @@ const app = express();
 // API
 app.use('/api/tiles', tilesRouter);
 app.use('/api/games', gamesRouter);
+app.use(express.static('frontend')); 
 
 // Serve static front‑end
 app.use(express.static(path.join(__dirname, '..', 'frontend')));

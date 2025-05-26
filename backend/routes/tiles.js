@@ -1,6 +1,5 @@
 // backend/routes/tiles.js
 import express from 'express';
-import { getTilesForGame } from '../services/mapService.js';
 
 export const tilesRouter = express.Router();
 
