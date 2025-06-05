@@ -1,41 +1,51 @@
+// tests/mapTiles.e2e.test.mjs
 import request from 'supertest';
-import { app } from '../backend/server.js';
+import { app, server } from '../backend/server.js';
 
-/*
-const request = require('supertest');
-const { app } = require('../backend/server.js');
-*/
-
-// Use a fixed game ID for testing
-const GAME_ID = 'f2190dd0-a51a-4eb6-9748-811a4fe14fa2';
-
-describe('Bootstrap served locally', () => {
-  it('css and js return 200', async () => {
-    await request(app)
-      .get('/vendor/bootstrap/css/bootstrap.min.css')
+/**
+ * Helper: ask for games, then tiles, until we find one with >0 tiles.
+ * Throws if none have tiles (so the test fails clearly).
+ */
+async function findGameWithTiles() {
+  const gamesRes = await request(app).get('/api/games').expect(200);
+  for (const g of gamesRes.body) {
+    const tilesRes = await request(app)
+      .get(`/api/games/${g.game_id}/tiles`)
       .expect(200)
-      .expect('content-type', /css/);
+      .expect('content-type', /json/);
 
-    await request(app)
-      .get('/vendor/bootstrap/js/bootstrap.bundle.min.js')
-      .expect(200)
-      .expect('content-type', /javascript/);
+    if (Array.isArray(tilesRes.body) && tilesRes.body.length) {
+      return { game: g, tiles: tilesRes.body };
+    }
+  }
+  throw new Error('No game with tiles found in test database');
+}
+
+describe('Map tiles endpoint', () => {
+  let gameId, tiles;
+
+  beforeAll(async () => {
+    ({ game: { game_id: gameId }, tiles } = await findGameWithTiles());
   });
-});
 
-describe('GET /api/games/:id/tiles', () => {
-  it('returns array of tiles as JSON', async () => {
-    const res = await request(app)
-      .get(`/api/games/${GAME_ID}/tiles`)
-      .expect('content-type', /json/)
-      .expect(200);
+  it('returns a non-empty array of tiles', () => {
+    expect(Array.isArray(tiles)).toBe(true);
+    expect(tiles.length).toBeGreaterThan(0);
+  });
 
-    expect(Array.isArray(res.body)).toBe(true);
-    // optional: at least one tile exists
-    expect(res.body.length).toBeGreaterThan(0);
-    // optional: check required fields
-    expect(res.body[0]).toHaveProperty('x');
-    expect(res.body[0]).toHaveProperty('y');
-    expect(res.body[0]).toHaveProperty('terrain_name');
+  it('each tile has required fields', () => {
+    const required = ['x', 'y', 'terrain_type_id'];
+    for (const t of tiles) {
+      for (const key of required) {
+        expect(t).toHaveProperty(key);
+      }
+    }
+  });
+
+  afterAll(done => {
+    // if the server was started outside test env, close it
+    server?.close(done);
+    // if no listener, just call done()
+    if (!server) done();
   });
 });

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon backend/server.js",
     "start": "cross-env NODE_ENV=production node backend/server.js",
-    "test": "cross-env NODE_ENV=test jest"
+    "test":  "cross-env NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest"
   },
 
   "dependencies": {
