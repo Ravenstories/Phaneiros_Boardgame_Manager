@@ -21,7 +21,11 @@ export async function loadComponent(name = 'start') {
     APP_EL.innerHTML = html;
 
     /* 2 – page logic (cache-bust so edits reload in dev) */
-    await import(`/${path}.js?v=${Date.now()}`);
+    const mod = await import(`/${path}.js?v=${Date.now()}`);
+    if (typeof mod.default === 'function') {
+      // pass the freshly injected container (APP_EL) or anything you like
+      await mod.default(APP_EL);
+    }
     pushHistory(name);              // update URL
   } catch (err) {
     console.error('[loadComponents] failed:', err);
@@ -35,6 +39,8 @@ async function fetchFragment(url) {
   if (!res.ok) throw new Error(`HTTP ${res.status} while fetching ${url}`);
   const txt = await res.text();
   const doc = new DOMParser().parseFromString(txt, 'text/html');
+
+  
   const main = doc.querySelector('main[id="page-content"]');
   if (!main) throw new Error(`${url} is missing <main id="page-content">`);
   return main.innerHTML;
