@@ -20,3 +20,8 @@ export function onChange(fn) {
   listeners.add(fn);
   return () => listeners.delete(fn);   // returns “unsubscribe”
 }
+
+export function subscribe(fn) {
+  fn(getGameId());
+  return onChange(fn);
+}

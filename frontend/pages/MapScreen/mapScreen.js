@@ -6,8 +6,8 @@
  * ❸  Guards every DOM handle, so it never throws on missing elements.
  ***************************************************************************/
 
-import { fetchMapTiles }            from '../../js/api/mapAPI.js';
-import { getGameId, onChange }      from '../../js/gameStore.js';
+import { fetchMapTiles }            from '../../services/api/mapAPI.js';
+import { getGameId, onChange }      from '../../services/gameStore.js';
 
 /* ── config -------------------------------------------------------------- */
 const HEX_SIZE = 60;

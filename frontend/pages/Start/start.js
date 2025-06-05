@@ -3,9 +3,9 @@ import {
   getGameId,    // read the current id
   setGameId,    // write the id + notify listeners
   onChange      // subscribe to changes
-} from '../../js/gameStore.js';
+} from '../../services/gameStore.js';
 
-import { renderCurrentGame } from '../../js/currentGameHeader.js';
+import { renderCurrentGameStatus } from '../../ui/currentGameStatus.js';
 
 /* ───────── DOM refs ──────── */
 const tbody      = document.querySelector('#game-table tbody');

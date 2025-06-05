@@ -1,15 +1,15 @@
-import { GameStorage } from './storage.js';
+import { gameStorage } from '../services/gameStorage.js';
 
 /**
  * Fetches /api/games/:id and injects a line like
  * “Game #17 (kingdom) – created 2025-05-15”
  * into the <div id="current-game">.
  */
-export async function renderCurrentGame() {
+export async function renderCurrentGameStatus() {
   const container = document.getElementById('current-game');
   if (!container) return;                       // safety
 
-  const id = GameStorage.get();
+  const id = gameStorage.get();
   if (!id) { container.textContent = ''; return; }
 
   try {
