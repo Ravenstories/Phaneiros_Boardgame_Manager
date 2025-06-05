@@ -15,7 +15,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Julius+Sans+One&display=swap" rel="stylesheet">
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=Uncial+Antiqua&display=swap" rel="stylesheet">
@@ -24,6 +23,7 @@
 
     <!--Scripts-->
     <script src="/js/loadComponents.js" type="module"></script>
+
     <!--
         <script src="/app.js" type="module" defer></script>
         <script src="frontend/js/navigation.js" type="module"></script>
@@ -39,13 +39,22 @@
         <nav>
             <a href="#" onclick="loadComponent('start')">Start</a> |
             <a href="#" onclick="loadComponent('kingdomCreation')">Create Kingdom</a> |
-            <a href="#" onclick="loadComponent('game')">Game</a>
+            <a href="#" onclick="loadComponent('game')">Game</a> |
             <a href="#" onclick="loadComponent('mapScreen')">Map</a>
         </nav>
     </header>
     
     <main id="app-container">
-        <div id="app"></div> <!-- Content will be injected here -->
+        <div id="app"><!-- Content will be injected here -->
+            <div id="start-page" class="page"></div>
+
+            <!-- ② hidden until user clicks “Map” -->
+            <div id="map-page"   class="page hidden">
+                <div id="map-board"></div>
+                <div id="tile-info"></div>
+            </div>
+        </div> 
+        
     </main>
 
     <!-- JS -->

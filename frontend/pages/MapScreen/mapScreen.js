@@ -1,301 +1,103 @@
-/******************************************************************************
- * MapScreen – renders a draggable, point-top hex map inside #map-board
- * depends on core/gameStore.js for the current game_id
- ******************************************************************************/
+/***************************************************************************
+ * Start component (game list)
+ * called by loadComponents.mount(rootElement)
+ ***************************************************************************/
 
-import { fetchMapTiles } from '../../js/api/mapAPI.js';
-import { getGameId, onChange } from '../../js/gameStore.js';
+import {
+  getGameId, setGameId, clearGameId, onChange
+} from '../../js/gameStore.js';
 
-/* CONFIG ------------------------------------------------------------------ */
-const HEX_SIZE   = 60;
-const HEX_GAP    = 4;
-const HEX_HEIGHT = HEX_SIZE * Math.sqrt(3) / 2;
-const COLORS = {
-  plains   : '#b5d99c',
-  forest   : '#6fbf73',
-  mountain : '#9b9b9b',
-  water    : '#6fa8dc',
-  desert   : '#e8d28b',
-  default  : '#dddddd',
-};
+export default async function init(root) {
+  if (!root || root.dataset.initialised) return;   // run once
+  root.dataset.initialised = 'y';
 
-/* DOM refs ---------------------------------------------------------------- */
-const board = document.getElementById('map-board');
-const info  = document.getElementById('tile-info');
-if (!board) throw new Error('[MapScreen] #map-board not found');
-board.style.position = 'relative';
+  /* DOM refs scoped to this root --------------------------------------- */
+  const tbody      = root.querySelector('#game-table tbody');
+  const emptyMsg   = root.querySelector('#empty-msg');
+  const loadedTag  = root.querySelector('#loaded-tag');
+  const mapLink    = root.querySelector('#map-link');
+  const newBtn     = root.querySelector('#btn-new');
+  const refreshBtn = root.querySelector('#btn-refresh');
+  const deleteBtn  = root.querySelector('#btn-delete');
 
-/* Drag-to-pan ------------------------------------------------------------- */
-let pan = { active:false, sx:0, sy:0, sl:0, st:0 };
-board.addEventListener('mousedown', e => {
-  if (e.button) return;
-  pan = { active:true, sx:e.clientX, sy:e.clientY,
-          sl:board.scrollLeft, st:board.scrollTop };
-  board.style.cursor = 'grabbing';
-});
-window.addEventListener('mousemove', e => {
-  if (!pan.active) return;
-  board.scrollLeft = pan.sl - (e.clientX - pan.sx);
-  board.scrollTop  = pan.st - (e.clientY - pan.sy);
-});
-window.addEventListener('mouseup', () => {
-  pan.active = false;
-  board.style.cursor = 'grab';
-});
+  /* boot ---------------------------------------------------------------- */
+  onChange(updateUI);
+  updateUI(getGameId());
+  loadGames();
 
-/* ─────────────────────────── BOOT ─────────────────────────── */
+  newBtn.onclick     = createGame;
+  refreshBtn.onclick = loadGames;
+  deleteBtn.onclick  = deleteCurrent;
 
-let unsubscribe;
-init();
-
-/** initial render + subscribe for later changes */
-function init() {
-  loadMap(getGameId());                 // draw what’s currently selected
-  unsubscribe = onChange(loadMap);      // redraw when selection changes
-}
-
-/* ─────────────────────────── LOAD + RENDER ───────────────── */
-
-async function loadMap(gameId) {
-  console.log('loadMap', gameId);
-  info.style.display = 'none';          // hide stale info
-  if (!gameId) {                        // no game selected yet
-    board.innerHTML = '<p class="map-msg">No game selected.</p>';
-    board.style.width = board.style.height = 'auto';
-    return;
+  /* UI helpers ---------------------------------------------------------- */
+  function updateUI(id) {
+    const en = !!id;
+    loadedTag.textContent       = en ? `Loaded: ${id}` : 'No game loaded.';
+    mapLink.style.pointerEvents = en ? 'auto':'none';
+    mapLink.style.opacity       = en ? '1':'.4';
+    mapLink.tabIndex            = en ? '0':'-1';
+    deleteBtn.disabled          = !en;
+    highlightRow(id);
   }
 
-  setLoading(true);
-  try {
-    const tiles = await fetchMapTiles(gameId);
-    renderMap(tiles);
-  } catch (err) {
-    console.error(err);
-    board.innerHTML = '<p class="map-msg">Could not load tiles.</p>';
-  } finally {
-    setLoading(false);
-  }
-}
-
-/* axial → pixel ----------------------------------------------------------- */
-const toPixel = (q,r) => ({
-  x:(HEX_SIZE+HEX_GAP)*(q+r/2),
-  y:(HEX_HEIGHT+HEX_GAP)*r
-});
-
-/* RENDER – place every tile inside #map-board so no negative coords. */
-function renderMap (tiles) {
-  console.log('renderMap', tiles.length);
-  board.textContent = '';
-  if (!tiles.length) {
-    board.innerHTML = '<p class="map-msg">Empty map.</p>';
-    return;
+  /* network ------------------------------------------------------------- */
+  async function loadGames() {
+    spin(true);
+    try {
+      const res   = await fetch('/api/games');
+      const games = await res.json();
+      renderRows(games);
+    } catch (e) { console.error(e); alert('Could not load games.'); }
+    finally     { spin(false); }
   }
 
-  const frag = document.createDocumentFragment();
-
-  // 1) bounding box
-  let minX=Infinity, minY=Infinity, maxX=-Infinity, maxY=-Infinity;
-  for (const t of tiles) {
-    const { x, y } = toPixel(t.x, t.y);
-    minX = Math.min(minX, x); minY = Math.min(minY, y);
-    maxX = Math.max(maxX, x); maxY = Math.max(maxY, y);
+  async function createGame() {
+    spin(true);
+    try {
+      const res = await fetch('/api/games', {
+        method :'POST',
+        headers:{'Content-Type':'application/json'},
+        body   : JSON.stringify({game_type:'kingdom'})
+      });
+      const {game_id} = await res.json();
+      setGameId(game_id);
+      await loadGames();
+    } catch (e) { console.error(e); alert('Could not create game.'); }
+    finally     { spin(false); }
   }
 
-  // 2) shift so smallest hex lands at (0,0)
-  const offsetX = -minX + HEX_GAP;
-  const offsetY = -minY + HEX_GAP;
-
-  // 3) build hexes
-  for (const t of tiles) {
-    const base = toPixel(t.x, t.y);
-    frag.appendChild(buildHex(t, base.x+offsetX, base.y+offsetY));
+  async function deleteCurrent() {
+    const id = getGameId();
+    if (!id || !confirm('Delete this game?')) return;
+    spin(true);
+    try {
+      await fetch(`/api/games/${id}`, {method:'DELETE'});
+      clearGameId();
+      await loadGames();
+    } catch (e) { console.error(e); alert('Could not delete game.'); }
+    finally     { spin(false); }
   }
 
-  // 4) resize board so it fully contains map
-  board.style.width  = `${maxX-minX + HEX_SIZE   + HEX_GAP*2}px`;
-  board.style.height = `${maxY-minY + HEX_HEIGHT + HEX_GAP*2}px`;
-  board.appendChild(frag);
-
-  // widen surrounding card if present
-  const card = document.getElementById('page-content');
-  if (card) card.style.width = `${board.offsetWidth + 32}px`;
-}
-
-/* Build one hex ----------------------------------------------------------- */
-function buildHex(tile,px,py){
-  const terrain = tile.terrain_type?.name || tile.terrain_name || 'plains';
-  const div=document.createElement('div');
-  div.className=`hex hex--${terrain}`;
-  div.style.left=`${px}px`;
-  div.style.top =`${py}px`;
-  div.style.setProperty('--fill', COLORS[terrain] || COLORS.default);
-  div.innerHTML=`<span>${tile.label}</span>`;
-  div.addEventListener('click',()=>showInfo(tile,terrain));
-  return div;
-}
-
-/* Info panel -------------------------------------------------------------- */
-function showInfo(tile,terrain){
-  if(!info) return;
-  info.innerHTML=`
-    <h4 style="margin:0 0 8px">${tile.label}</h4>
-    <p><strong>Terrain:</strong> ${terrain}</p>
-    <p><strong>Coords:</strong> ${tile.x}, ${tile.y}</p>`;
-  info.style.display='block';
-}
-
-/* BUTTONS ------------------------------------------------- */
-window.addEventListener('keydown',e=>{
-  if(e.key==='Escape') info.style.display='none';
-});
-window.addEventListener('keydown',e=>{
-  if(e.altKey) board.classList.add('show-labels');
-});
-window.addEventListener('keyup',e=>{
-  if(!e.altKey) board.classList.remove('show-labels');
-});
-
-/* Loading overlay ---------------------------------------- */
-function setLoading(on){
-  board.classList.toggle('loading', on);
-}
-
-
-
-/******************************************************************************
- * MapScreen – renders a draggable, point-top hex map inside #map-board
- ******************************************************************************
-
-import { fetchMapTiles } from '../../js/api/mapAPI.js';
-
-/* CONFIG ------------------------------------------------------------------ 
-const HEX_SIZE   = 60;
-const HEX_GAP    = 4;
-const HEX_HEIGHT = HEX_SIZE * Math.sqrt(3) / 2;
-const COLORS = {
-  plains   : '#b5d99c',
-  forest   : '#6fbf73',
-  mountain : '#9b9b9b',
-  water    : '#6fa8dc',
-  desert   : '#e8d28b',
-  default  : '#dddddd',
-};
-
-/* DOM refs ---------------------------------------------------------------- 
-const board = document.getElementById('map-board');   // new!
-const info  = document.getElementById('tile-info');
-if (!board) throw new Error('[MapScreen] #map-board not found');
-board.style.position = 'relative';
-
-/* Drag-to-pan ------------------------------------------------------------- 
-let pan = { active:false, sx:0, sy:0, sl:0, st:0 };
-board.addEventListener('mousedown', e => {
-  if (e.button) return;
-  pan = { active:true, sx:e.clientX, sy:e.clientY,
-          sl:board.scrollLeft, st:board.scrollTop };
-  board.style.cursor = 'grabbing';
-});
-window.addEventListener('mousemove', e => {
-  if (!pan.active) return;
-  board.scrollLeft = pan.sl - (e.clientX - pan.sx);
-  board.scrollTop  = pan.st - (e.clientY - pan.sy);
-});
-window.addEventListener('mouseup', () => {
-  pan.active = false;
-  board.style.cursor = 'grab';
-});
-
-/* Boot -------------------------------------------------------------------- 
-(async function init () {
-  const gameId = new URLSearchParams(location.search).get('gameId')
-             || localStorage.getItem('currentGameId');
-  if (!gameId) return alert('No gameId set');
-
-  const tiles = await fetchMapTiles(gameId).catch(err => {
-    console.error(err); alert('Could not load map tiles'); return [];
-  });
-  renderMap(tiles);
-})();
-
-/* axial → pixel ----------------------------------------------------------- 
-const toPixel = (q,r) => ({
-  x:(HEX_SIZE+HEX_GAP)*(q+r/2),
-  y:(HEX_HEIGHT+HEX_GAP)*r
-});
-
-/* Render ------------------------------------------------------------------ 
-/* RENDER – place every tile inside #map-board so no negative coords. 
-function renderMap (tiles) {
-  board.textContent = '';                   // clear previous board
-  const frag = document.createDocumentFragment();
-
-  // 1) find bounding box in pixel space
-  let minX = Infinity, minY = Infinity,
-      maxX = -Infinity, maxY = -Infinity;
-
-  for (const t of tiles) {
-    const { x, y } = toPixel(t.x, t.y);
-    minX = Math.min(minX, x);
-    minY = Math.min(minY, y);
-    maxX = Math.max(maxX, x);
-    maxY = Math.max(maxY, y);
+  /* dom ----------------------------------------------------------------- */
+  function renderRows(games) {
+    tbody.innerHTML = '';
+    if (!games.length) { emptyMsg.textContent = '— no games yet —'; return; }
+    emptyMsg.textContent = '';
+    games.forEach(g => {
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        `<td>${new Date(g.created_at).toLocaleDateString()}</td><td>${g.game_type}</td>`;
+      tr.dataset.id = g.game_id;
+      tr.onclick    = () => setGameId(g.game_id);
+      tbody.append(tr);
+    });
+    highlightRow(getGameId());
   }
 
-  // 2) shift so smallest hex lands at (0,0)
-  const offsetX = -minX + HEX_GAP;          // add one gap for padding
-  const offsetY = -minY + HEX_GAP;
-
-  // 3) build hexes using the pre-computed offset
-  for (const t of tiles) {
-    const base = toPixel(t.x, t.y);
-    frag.appendChild(buildHex(t, base.x + offsetX, base.y + offsetY));
+  function highlightRow(id) {
+    Array.from(tbody.children)
+      .forEach(tr => tr.classList.toggle('active', tr.dataset.id === id));
   }
 
-  // 4) resize #map-board so it fully contains the map
-  const boardWidth  = maxX - minX + HEX_SIZE   + HEX_GAP * 2;
-  const boardHeight = maxY - minY + HEX_HEIGHT + HEX_GAP * 2;
-  board.style.width  = `${boardWidth}px`;
-  board.style.height = `${boardHeight}px`;
-
-  board.appendChild(frag);
-
-  // ── 5. widen the surrounding card so nothing spills ──────────────
-  const card = document.getElementById('page-content');
-  if (card) card.style.width = `${boardWidth + 32}px`;   // + padding*2
+  function spin(on) { root.classList.toggle('loading', on); }
 }
-
-/* Build one hex ----------------------------------------------------------- 
-function buildHex(tile,px,py){
-  const terrain = tile.terrain_type?.name || tile.terrain_name || 'plains';
-  const div=document.createElement('div');
-  div.className=`hex hex--${terrain}`;
-  div.style.left=`${px}px`; div.style.top=`${py}px`;
-  div.style.setProperty('--fill',COLORS[terrain]||COLORS.default);
-  div.innerHTML=`<span>${tile.label}</span>`;
-  div.addEventListener('click',()=>showInfo(tile,terrain));
-  return div;
-}
-
-/* Info panel -------------------------------------------------------------- 
-function showInfo(tile,terrain){
-  if(!info) return;
-  info.innerHTML=`
-    <h4 style="margin:0 0 8px">${tile.label}</h4>
-    <p><strong>Terrain:</strong> ${terrain}</p>
-    <p><strong>Coords:</strong> ${tile.x}, ${tile.y}</p>`;
-  info.style.display='block';
-}
-
-/* BUTTONS ------------------------------------------------- 
-window.addEventListener('keydown',e=>{
-  if(e.key==='Escape') info.style.display='none';
-});
-window.addEventListener('keydown',e=>{
-  if(e.altKey) board.classList.add('show-labels');
-});
-window.addEventListener('keyup',e=>{
-  if(!e.altKey) board.classList.remove('show-labels');
-});
-
-*/
