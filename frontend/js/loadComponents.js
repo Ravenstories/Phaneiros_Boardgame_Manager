@@ -1,63 +1,118 @@
 /**
- * Scan all <script data-component> tags, dynamically import them,
- * and call their default export ({target}) => void ONLY if target exists.
+ * Component Loader & Router
+ * Clean structure for loading pages, layout parts (header/footer), and more.
+ * Handles navigation, history, and dynamic imports.
  */
-const PAGE_BASE = 'pages';          // root folder
-const ROUTES = {                    // map link name → folder
-  start:             `${PAGE_BASE}/Start/start`,
-  kingdomCreation:   `${PAGE_BASE}/KingdomCreationScreen/kingdomCreationScreen`,
-  kingdomOverview:   `${PAGE_BASE}/KingdomOverviewScreen/kingdomOverviewScreen`,
-  mapScreen:         `${PAGE_BASE}/MapScreen/mapScreen`
-};
 
 const APP_EL = document.getElementById('app');
-if (!APP_EL) throw new Error('[loadComponents] #app element not found');
+if (!APP_EL) throw new Error('[loader] #app element not found');
+const PAGE_BASE = 'pages';
+const LAYOUT_BASE = 'layout';
+const COMPONENTS = {
+  pages: {
+    start:        `${PAGE_BASE}/Start/start`,
+    mapScreen:    `${PAGE_BASE}/MapScreen/mapScreen`
+  },
+  layout: {
+    header: `${LAYOUT_BASE}/Header/header`,
+    footer: `${LAYOUT_BASE}/Footer/footer`
+  }
+};
 
-export async function loadComponent(name = 'start') {
-  const path = ROUTES[name] || ROUTES.start;
-  try {
-    /* 1 – HTML fragment */
-    const html = await fetchFragment(`${path}.html`);
-    APP_EL.innerHTML = html;
+let currentModule = null;
 
-    /* 2 – page logic (cache-bust so edits reload in dev) */
-    const mod = await import(`/${path}.js?v=${Date.now()}`);
-    if (typeof mod.default === 'function') {
-      // pass the freshly injected container (APP_EL) or anything you like
-      await mod.default(APP_EL);
-    }
-    pushHistory(name);              // update URL
-  } catch (err) {
-    console.error('[loadComponents] failed:', err);
-    APP_EL.innerHTML = '<p class="error-loading-content">Error loading content.</p>';
+/**
+ * Public API: Navigate to a page (with history tracking)
+ */
+export function navigateTo(name) {
+  const url = `/${name}`;
+  if (location.pathname !== url) {
+    history.pushState({ screen: name }, '', url);
+  }
+  loadPage(name);
+}
+
+/**
+ * Load a page component into #app
+ */
+export async function loadPage(name) {
+  const path = COMPONENTS.pages[name] || COMPONENTS.pages.start;
+  console.log(`[loader] loading page: ${path}`);
+
+  if (typeof currentModule?.cleanup === 'function') {
+    currentModule.cleanup();
+  }
+
+  const html = await fetchFragment(`${path}.html`);
+  APP_EL.innerHTML = html;
+
+  const mod = await import(`/${path}.js?v=${Date.now()}`);
+  currentModule = mod;
+
+  if (typeof mod.default === 'function') {
+    mod.default({ target: APP_EL });
   }
 }
 
-/* helpers --------------------------------------------------------------- */
+/**
+ * Load a layout component into a given target element
+ */
+export async function loadLayout(name, targetSelector) {
+  const path = COMPONENTS.layout[name];
+  const target = document.querySelector(targetSelector);
+  if (!path || !target) return;
+
+  const html = await fetchFragment(`${path}.html`);
+  target.innerHTML = html;
+
+  const mod = await import(`/${path}.js?v=${Date.now()}`);
+  if (typeof mod.default === 'function') {
+    mod.default({ target });
+  }
+}
+
+/**
+ * Utility: Fetch an HTML fragment and extract <main id="page-content">
+ */
 async function fetchFragment(url) {
-  const res = await fetch(url, { cache:'no-store' });
+  const res = await fetch(url, { cache: 'no-store' });
   if (!res.ok) throw new Error(`HTTP ${res.status} while fetching ${url}`);
   const txt = await res.text();
   const doc = new DOMParser().parseFromString(txt, 'text/html');
-
-  
-  const main = doc.querySelector('main[id="page-content"]');
-  if (!main) throw new Error(`${url} is missing <main id="page-content">`);
+  const main = doc.querySelector('main#page-content') || doc.body;
   return main.innerHTML;
 }
 
-function pushHistory(name) {
-  const url = `/${name}`;
-  if (location.pathname !== url) history.pushState({ screen:name }, '', url);
-}
-
-window.addEventListener('popstate', ev => {
+/**
+ * Popstate: Back/forward browser buttons
+ */
+window.addEventListener('popstate', (ev) => {
   const screen = ev.state?.screen || 'start';
-  loadComponent(screen);
+  loadPage(screen);
 });
 
-/* expose globally for navbar onclick="" */
-window.loadComponent = loadComponent;
+/**
+ * Initial page load
+ */
+document.addEventListener('DOMContentLoaded', () => {
+  const screen = location.pathname.slice(1) || 'start';
+  history.replaceState({ screen }, location.pathname);
+  loadPage(screen);
+});
 
-/* load initial screen */
-document.addEventListener('DOMContentLoaded', () => loadComponent('start'));
+document.addEventListener('click', (e) => {
+  const link = e.target.closest('[data-page]');
+  if (!link) return;
+
+  e.preventDefault(); // ← THIS prevents browser from touching history
+  const page = link.dataset.page;
+  navigateTo(page);
+});
+
+
+/**
+ * Expose for global use in inline handlers
+ */
+window.navigateTo = navigateTo;
+window.loadPage = loadPage;
+window.loadLayout = loadLayout;

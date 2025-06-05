@@ -19,9 +19,10 @@ const COLORS   = {
 };
 
 /* ── public API (called by loader or self-boot) -------------------------- */
-export default async function init(board) {
-  if (!board || board.dataset.initialised) return;      // run once
-  board.dataset.initialised = 'y';
+export default async function init({ target }) {
+  console.log('[MapScreen] init() called');
+  const board = target.querySelector('#map-board');
+  if (!board || board.dataset.initialised) return;
   board.style.position = 'relative';
 
   const info = document.getElementById('tile-info');    // may be null
@@ -112,6 +113,7 @@ export default async function init(board) {
   function setLoading(on){ board.classList.toggle('loading',on); }
 }
 
-/* ── self-boot when imported -------------------------------------------- */
+/* ── self-boot when imported -------------------------------------------- 
 const boardEl = document.getElementById('map-board');
 init(boardEl);
+*/

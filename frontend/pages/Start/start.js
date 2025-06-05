@@ -11,7 +11,7 @@ import { renderCurrentGame } from '../../js/currentGameHeader.js';
 const tbody      = document.querySelector('#game-table tbody');
 const emptyMsg   = document.getElementById('empty-msg');
 const loadedTag  = document.getElementById('loaded-tag');
-const mapLink    = document.getElementById('map-link');
+//const mapLink    = document.getElementById('map-link');
 const newBtn     = document.getElementById('btn-new');
 const refreshBtn = document.getElementById('btn-refresh');
 const deleteBtn  = document.getElementById('btn-delete');
@@ -30,9 +30,11 @@ deleteBtn.onclick  = deleteCurrent;
 function updateUI(id){
   const enabled = !!id;
   loadedTag.textContent = enabled ? `Loaded: ${id}` : 'No game loaded.';
+  /*
   mapLink.style.pointerEvents = enabled ? 'auto':'none';
   mapLink.tabIndex            = enabled ? '0':'-1';
   mapLink.style.opacity       = enabled ? '1':'.4';
+  */
   deleteBtn.disabled          = !enabled;
   highlightRow(id);
 }
