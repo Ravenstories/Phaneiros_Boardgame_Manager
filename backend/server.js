@@ -6,7 +6,7 @@ import { tilesRouter } from './routes/tiles.js';
 import { gamesRouter } from './routes/games.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const app = express();
+export const app = express();
 
 // API
 app.use('/api', tilesRouter);
@@ -15,6 +15,14 @@ app.use(express.static('frontend'));
 
 // Serve static front‑end
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
+
+app.use(
+  '/vendor/bootstrap',                             // URL prefix
+  express.static(                                  
+    path.resolve('node_modules/bootstrap/dist'),   // local folder
+    { index: false }                               // no directory listing
+  )
+);
 
 // Fallback for client‑side routing (optional)
 app.get('*', (_req, res) =>
