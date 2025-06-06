@@ -1,7 +1,7 @@
 // core/authService.js
 // Handles login, logout, signup and role checks
 
-import { userStore } from '../services/userStore.js';
+import { userStore } from '../../frontend/services/userStore.js';
 
 export async function login(email, password) {
   const res = await fetch('/api/login', {
