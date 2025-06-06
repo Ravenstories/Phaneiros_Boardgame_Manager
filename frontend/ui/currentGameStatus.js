@@ -27,3 +27,28 @@ export async function renderCurrentGameStatus() {
     container.textContent = '⚠️ Error loading game';
   }
 }
+
+/*
+export async function renderCurrentGameStatus() {
+  const container = document.getElementById('current-game');
+  if (!container) return;                       // safety
+
+  const id = gameStorage.get();
+  if (!id) { container.textContent = ''; return; }
+
+  try {
+    const res  = await fetch(`/api/games/${id}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const game = await res.json();
+
+    container.innerHTML =
+      `Game <strong>#${game.game_id}</strong> `
+    + `(${game.game_type}) – `
+    + new Date(game.created_at).toLocaleString();
+
+  } catch (err) {
+    console.error('Couldn’t load current game:', err);
+    container.textContent = '⚠️ Error loading game';
+  }
+}
+  */

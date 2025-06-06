@@ -12,12 +12,7 @@
     <link rel="stylesheet" href="assets/css/mapStyle.css">
 
     <!--Google Fonts-->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Julius+Sans+One&display=swap" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=Uncial+Antiqua&display=swap" rel="stylesheet">
+    
 
     <!--Libraries-->
 
@@ -33,13 +28,14 @@
 </head>
 <body>
 
-    <header class="fade-border">
-        <h1>Phaneiros Boardgame Manager</h1>
-        <nav>
-            <a href="#" data-page="start">Start</a>
-            <a href="#" data-page="mapScreen">Map</a>
-        </nav>
-    </header>
+    <nav class="main-nav d-flex justify-content-center">
+        <ul class="nav text-center list-unstyled"> 
+            <li><a class="nav-link text-uppercase" href="#" data-page="start">Start</a></li>
+            <li><a class="nav-link text-uppercase" href="#" data-page="mapScreen">Map</a></li>
+        </ul>
+    </nav>
+
+    
     
     <main id="app-container">
         <div id="app"><!-- Content will be injected here -->
