@@ -1,24 +1,3 @@
-export const userStore = {
-  current: null,
-  listeners: new Set(),
-
-  login(user) {
-    this.current = user;
-    this.listeners.forEach(fn => fn(user));
-  },
-
-  logout() {
-    this.current = null;
-    this.listeners.forEach(fn => fn(null));
-  },
-
-  subscribe(fn) {
-    fn(this.current);
-    this.listeners.add(fn);
-    return () => this.listeners.delete(fn);
-  }
-};
-
 let currentUser = null;
 
 export function login(user) {
@@ -29,11 +8,23 @@ export function login(user) {
 export function logout() {
   currentUser = null;
   localStorage.removeItem('user');
+  localStorage.removeItem('token');
 }
 
 export function getUser() {
   if (currentUser) return currentUser;
   const stored = localStorage.getItem('user');
-  if (stored) currentUser = JSON.parse(stored);
-  return currentUser;
+  if (stored) {
+    currentUser = JSON.parse(stored);
+    return currentUser;
+  }
+  return null;
+}
+
+export function isLoggedIn() {
+  return !!getUser();
+}
+
+export function getToken() {
+  return localStorage.getItem('token');
 }

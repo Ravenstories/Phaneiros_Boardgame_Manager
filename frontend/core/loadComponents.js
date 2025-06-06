@@ -3,9 +3,6 @@
  * Clean structure for loading pages, layout parts (header/footer), and more.
  * Handles navigation, history, and dynamic imports.
  */
-
-import { login } from "../../backend/services/authService";
-
 const APP_EL = document.getElementById('app');
 if (!APP_EL) throw new Error('[loader] #app element not found');
 const PAGE_BASE = 'pages';
