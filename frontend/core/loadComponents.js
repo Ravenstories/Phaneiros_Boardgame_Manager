@@ -4,6 +4,8 @@
  * Handles navigation, history, and dynamic imports.
  */
 
+import { login } from "../../backend/services/authService";
+
 const APP_EL = document.getElementById('app');
 if (!APP_EL) throw new Error('[loader] #app element not found');
 const PAGE_BASE = 'pages';
@@ -11,7 +13,10 @@ const LAYOUT_BASE = 'layout';
 const COMPONENTS = {
   pages: {
     start:        `${PAGE_BASE}/Start/start`,
-    mapScreen:    `${PAGE_BASE}/MapScreen/mapScreen`
+    mapScreen:    `${PAGE_BASE}/MapScreen/mapScreen`,
+    login:        `${PAGE_BASE}/Login/login`,
+    signup:       `${PAGE_BASE}/Signup/signup`,
+    gameChooser:  `${PAGE_BASE}/GameChooser/gameChooser`,
   },
   layout: {
     header: `${LAYOUT_BASE}/Header/header`,

@@ -1,19 +1,13 @@
-import { login } from '../../core/authService.js';
-import { navigateTo } from '../../core/router.js';
+import { loginUser } from '../services/api/userAPI.js';
 
-export default function init({ target }) {
-  const form = target.querySelector('#login-form');
-  const error = target.querySelector('#login-error');
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    error.textContent = '';
-    const data = new FormData(form);
-    try {
-      await login(data.get('email'), data.get('password'));
-      navigateTo('start');
-    } catch (err) {
-      error.textContent = 'Login failed: ' + err.message;
-    }
-  });
-}
+document.getElementById('login-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  try {
+    await loginUser(email, password);
+    window.location.href = '/pages/Start/start.html';
+  } catch (err) {
+    alert(err.message);
+  }
+});
