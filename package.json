@@ -2,27 +2,26 @@
   "name": "phaneiros-kingdom-manager",
   "private": true,
   "type": "module",
-
   "scripts": {
     "dev": "nodemon backend/server.js",
     "start": "cross-env NODE_ENV=production node backend/server.js",
-    "test":  "cross-env NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest"
+    "test": "cross-env NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest",
+    "scss": "sass frontend/assets/scss/style.scss frontend/assets/css/style.css",
+    "scss:watch": "sass --watch frontend/assets/scss/style.scss frontend/assets/css/style.css"
   },
-
   "dependencies": {
     "@supabase/supabase-js": "^2.49.1",
     "bootstrap": "^5.3.6",
     "dotenv": "^16.4.7",
     "express": "^4.21.2"
   },
-
   "devDependencies": {
     "cross-env": "^7.0.3",
     "jest": "^29.7.0",
     "nodemon": "^3.1.9",
+    "sass": "^1.89.1",
     "supertest": "^7.1.1"
   },
-
   "jest": {
     "testEnvironment": "node"
   }
