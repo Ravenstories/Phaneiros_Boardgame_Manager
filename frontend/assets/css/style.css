@@ -1,20 +1,7 @@
-<<<<<<< HEAD
-/*header*/
-
-.main-nav {
-  color: #FDF2D4;
-  background-color: #33332F;
+.displayheading {
+  font-family: "Pirata One", serif;
 }
 
-.nav-link {
-    color: #FDF2D4;
+.readingfont {
+  font-family: "Newsreader", serif;
 }
-
-.nav-link:hover {
-  color: #DAA952;
-} 
-=======
-
->>>>>>> 4daed5eae81811d007bcbe9505e125a39f52110b
-
-/*# sourceMappingURL=style.css.map */
