@@ -1,28 +1,36 @@
 
 <!-- ───────────── Sidebar ───────────── -->
-<main id="page-content" class="card">
-  <aside class="sidebar">
-    <header>
-      <h1>Games</h1>
-      <p id="loaded-tag" class="loaded-tag">No game loaded.</p>
-    </header>
+<main id="page-content" class="container mt-4">
+  <div class="row">
+    <div class="col-md-4 mb-3">  
+      <section class="sidebar mt-3">
+        <header class="bg-black">
+          <h1 class="text-white">Games</h1>
+          <p id="loaded-tag" class="loaded-tag text-white">No game loaded.</p>
+        </header>
 
-    <nav class="btn-group">
-      <button id="btn-new" class="btn btn--primary"   title="Create new">＋ New</button>
-      <button id="btn-refresh" class="btn"            title="Reload list">⟳ Refresh</button>
-      <button id="btn-delete"  class="btn btn--danger"title="Delete loaded" disabled>🗑 Delete</button>
-      <!--
-        <a id="map-link" class="btn btn--go" href="#" tabindex="-1" onclick="loadComponent('mapScreen'); return false;">Map →</a>
-        -->
-    </nav>
-  </aside>
+        <div class="btn-group">
+          <button id="btn-new" class="btn btn-primary"   title="Create new">＋ New</button>
+          <button id="btn-refresh" class="btn btn-success"            title="Reload list">⟳ Refresh</button>
+          <button id="btn-delete"  class="btn btn-danger"title="Delete loaded" disabled>🗑 Delete</button>
 
+          <!--
+          <a id="map-link" class="btn btn--go" href="#" tabindex="-1" onclick="loadComponent('mapScreen'); return false;">Map →</a>
+          -->
+
+        </div>
+      </section>
+    </div>
+  
   <!-- ───────────── Main list ──────────── -->
-  <section class="list-panel">
-    <table id="game-table" class="game-table">
-      <thead><tr><th>Created</th><th>Type</th></tr></thead>
-      <tbody><!-- rows injected by JS --></tbody>
-    </table>
-    <p id="empty-msg" class="msg"></p>
-  </section>
+    <div class="col-md-8"> 
+      <section class="list-panel">
+        <table id="game-table" class="game-table">
+          <thead><tr><th>Created</th><th>Type</th></tr></thead>
+          <tbody><!-- rows injected by JS --></tbody>
+        </table>
+        <p id="empty-msg" class="msg"></p>
+      </section>
+    </div>
+  </div>
 </main>
