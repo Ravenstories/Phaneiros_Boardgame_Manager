@@ -1,0 +1,7 @@
+@use 'variables';
+
+main {
+  padding: variables.$spacing-unit;
+  max-width: 1000px;
+  margin: 0 auto;
+}

@@ -1,0 +1,17 @@
+@use 'variables';
+@use 'base';
+@use 'layout';
+@use 'nav';
+@use 'pages';
+
+
+$primary-color: #2c3e50;
+
+body {
+  background-color: $primary-color;
+
+  h1 {
+    color: white;
+    text-shadow: 1px 1px 0 black;
+  }
+}

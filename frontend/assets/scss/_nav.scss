@@ -1,0 +1,21 @@
+@use 'variables';
+
+.main-nav {
+  background-color: darken(variables.$color-bg, 5%);
+  padding: variables.$spacing-unit 0;
+
+  .nav {
+    gap: 2rem;
+
+    .nav-link {
+      color: variables.$color-text;
+      font-weight: bold;
+      transition: 0.2s ease;
+
+      &:hover {
+        color: variables.$color-accent;
+        transform: scale(1.1);
+      }
+    }
+  }
+}
