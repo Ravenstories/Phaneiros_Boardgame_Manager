@@ -21,3 +21,4 @@ This project contains a small Node.js/Express backend and static frontend for tr
 4. Run tests:
    ```bash
    npm test
+   ```
