@@ -1,20 +1,20 @@
 @use 'variables';
 
 .main-nav {
-  background-color: darken(variables.$color-bg, 5%);
-  padding: variables.$spacing-unit 0;
+  background-color: black;
+  padding: 0.75rem 0;
 
-  .nav {
+  ul.nav {
     gap: 2rem;
 
     .nav-link {
       color: variables.$color-text;
-      font-weight: bold;
+      font-weight: 600;
       transition: 0.2s ease;
 
       &:hover {
         color: variables.$color-accent;
-        transform: scale(1.1);
+        transform: translateY(-2px);
       }
     }
   }

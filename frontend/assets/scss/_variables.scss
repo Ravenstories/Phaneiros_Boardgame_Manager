@@ -1,8 +1,15 @@
-$color-bg: #2c3e50;
+$color-bg: #1f2a38;
+$color-surface: #2b3a4b;
 $color-text: #ecf0f1;
-$color-accent: #3498db;
+$color-muted: #a5b1c2;
+$color-accent: #4aa3df;
 $color-danger: #e74c3c;
+$color-success: #27ae60;
+$color-warning: #f39c12;
 
 $font-main: 'Segoe UI', sans-serif;
+$font-heading: 'Segoe UI Semibold', sans-serif;
 
-$spacing-unit: 1rem;
+$radius: 8px;
+$spacing: 1rem;
+$shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
