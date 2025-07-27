@@ -10,3 +10,43 @@ export async function fetchJSON(url, opts={}) {
   sessionStorage.setItem(url, JSON.stringify(data));
   return data;
 }
+
+export async function httpGet(url, headers = {}) {
+  return fetchJSON(url, {
+    method: 'GET',
+    headers: {
+      ...headers,
+    },
+  });
+}
+
+export async function httpPost(url, data, headers = {}) {
+  return fetchJSON(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...headers,
+    },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function httpPut(url, data, headers = {}) {
+  return fetchJSON(url, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      ...headers,
+    },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function httpDelete(url, headers = {}) {
+  return fetchJSON(url, {
+    method: 'DELETE',
+    headers: {
+      ...headers,
+    },
+  });
+}

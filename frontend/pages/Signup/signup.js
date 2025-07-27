@@ -1,4 +1,4 @@
-import { signupUser } from '../services/api/userAPI.js';
+import { signupUser } from '../../services/api/userAPI.js';
 
 document.getElementById('signup-form').addEventListener('submit', async (e) => {
   e.preventDefault();
