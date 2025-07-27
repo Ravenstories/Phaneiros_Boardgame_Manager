@@ -2,6 +2,7 @@ import express from 'express';
 import * as userService from '../services/userService.js';
 
 const router = express.Router();
+router.use(express.json());
 
 router.post('/signup', async (req, res) => {
   const { email, password } = req.body;
@@ -52,4 +53,5 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-export default router;
+
+export { router as usersRouter };

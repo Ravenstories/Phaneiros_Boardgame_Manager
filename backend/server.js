@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 import { tilesRouter }  from './routes/tiles.js';
 import { gamesRouter }  from './routes/games.js';
+import { usersRouter }  from './routes/users.js';
 
 /* ── helpers ─────────────────────────────────────────────── */
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -17,6 +18,7 @@ export const app = express();
 /* API routes */
 app.use('/api/games', gamesRouter);       // /api/games/…
 app.use('/api',       tilesRouter);       // /api/games/:id/tiles
+app.use('/api/users', usersRouter);       // /api/users/…
 
 /* static assets */
 app.use(express.static(FRONTEND_DIR));
