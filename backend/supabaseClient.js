@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { sqlHelper } from './librarys/sqlHelper.js';
+import { sqlHelper } from './library/sqlHelper.js';
 import 'dotenv/config';
 
 let schema = 'public';
