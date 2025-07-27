@@ -1,7 +1,6 @@
 // backend/routes/tiles.js
 import express from 'express';
 import { getTilesForGame } from '../services/mapService.js';   // import function
-// (you don’t need createHash right now; remove it)
 
 export const tilesRouter = express.Router();
 

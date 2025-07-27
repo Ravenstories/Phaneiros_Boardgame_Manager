@@ -1,7 +1,33 @@
 // tests/mapTiles.e2e.test.mjs
 import request from 'supertest';
-import { app, server } from '../backend/server.js';
+//import { app, server } from '../backend/server.js';
+import { jest } from '@jest/globals';
 
+// Mock the Supabase client with simple dummy behaviour
+const rpcMock = jest.fn(async (_proc, args) => {
+  if (args?.params?.game_id) {
+    // return one dummy tile for any game
+    return { data: [{ x: 0, y: 0, terrain_type_id: 1 }], error: null };
+  }
+  // games list
+  return { data: [{ game_id: 1, game_type: 'kingdom' }], error: null };
+});
+
+jest.unstable_mockModule('@supabase/supabase-js', () => ({
+  createClient: () => ({
+    rpc: rpcMock,
+    from: jest.fn(() => ({
+      select: jest.fn().mockReturnThis(),
+      insert: jest.fn().mockReturnThis(),
+      update: jest.fn().mockReturnThis(),
+      delete: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      single: jest.fn(async () => ({ data: null, error: null })),
+    })),
+  }),
+}));
+
+const { app, server } = await import('../backend/server.js');
 /**
  * Helper: ask for games, then tiles, until we find one with >0 tiles.
  * Throws if none have tiles (so the test fails clearly).

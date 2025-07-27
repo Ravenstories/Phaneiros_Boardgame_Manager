@@ -1,5 +1,23 @@
 import request from 'supertest';
-import { app, server } from '../backend/server.js';
+//import { app, server } from '../backend/server.js';
+import { jest } from '@jest/globals';
+
+// Mock the Supabase client so no real credentials are required
+jest.unstable_mockModule('@supabase/supabase-js', () => ({
+  createClient: () => ({
+    rpc: jest.fn(async () => ({ data: [], error: null })),
+    from: jest.fn(() => ({
+      select: jest.fn().mockReturnThis(),
+      insert: jest.fn().mockReturnThis(),
+      update: jest.fn().mockReturnThis(),
+      delete: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      single: jest.fn(async () => ({ data: null, error: null })),
+    })),
+  }),
+}));
+
+const { app, server } = await import('../backend/server.js');
 
 describe('local Bootstrap assets', () => {
   it('CSS is served with 200', async () => {
