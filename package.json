@@ -3,11 +3,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "nodemon backend/server.js",
+    "dev": "concurrently \"npm:dev:server\" \"npm:dev:sass\"",
+    "dev:server": "nodemon backend/server.js",
+    "dev:sass": "sass frontend/assets/scss/style.scss frontend/assets/css/style.css --watch",
     "start": "cross-env NODE_ENV=production node backend/server.js",
     "test": "cross-env NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest",
     "scss": "sass frontend/assets/scss/style.scss frontend/assets/css/style.css",
-    "scss:watch": "sass frontend/assets/scss/style.scss frontend/assets/css/style.css --watch"
+    "scss:watch": "npm run dev:sass"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.1",
