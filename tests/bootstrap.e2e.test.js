@@ -2,6 +2,8 @@ import request from 'supertest';
 //import { app, server } from '../backend/server.js';
 import { jest } from '@jest/globals';
 
+process.env.JWT_SECRET = process.env.JWT_SECRET || 'testsecret';
+
 // Mock the Supabase client so no real credentials are required
 jest.unstable_mockModule('@supabase/supabase-js', () => ({
   createClient: () => ({

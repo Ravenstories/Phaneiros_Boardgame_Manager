@@ -3,6 +3,8 @@ import request from 'supertest';
 //import { app, server } from '../backend/server.js';
 import { jest } from '@jest/globals';
 
+process.env.JWT_SECRET = process.env.JWT_SECRET || 'testsecret';
+
 // Mock the Supabase client with simple dummy behaviour
 const rpcMock = jest.fn(async (_proc, args) => {
   if (args?.params?.game_id) {

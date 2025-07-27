@@ -1,6 +1,8 @@
 import request from 'supertest';
 import { jest } from '@jest/globals';
 
+process.env.JWT_SECRET = process.env.JWT_SECRET || 'testsecret';
+
 jest.unstable_mockModule('@supabase/supabase-js', () => ({
   createClient: () => ({
     rpc: jest.fn(async () => ({ data: [], error: null })),
