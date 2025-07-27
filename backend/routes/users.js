@@ -1,5 +1,6 @@
 import express from 'express';
 import * as userService from '../services/userService.js';
+import e from 'express';
 
 const router = express.Router();
 router.use(express.json());
@@ -55,3 +56,4 @@ router.delete('/:id', async (req, res) => {
 
 
 export { router as usersRouter };
+export default router;

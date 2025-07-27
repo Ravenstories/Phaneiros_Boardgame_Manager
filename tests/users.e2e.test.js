@@ -22,7 +22,7 @@ const { app, server } = await import('../backend/server.js');
 describe('User signup endpoint', () => {
   it('responds with 201', async () => {
     await request(app)
-      .post('/api/users/signup')
+      .post('/api/signup')
       .send({ email: 'test@example.com', password: 'pw' })
       .expect(201);
   });
