@@ -7,11 +7,11 @@ if (!JWT_SECRET) {
   throw new Error('JWT_SECRET environment variable must be set');
 }
 
-export async function registerUser(email, password) {
+export async function registerUser(email, password, details = {}) {
   const existing = await userRepo.getUserByEmail(email);
   if (existing) throw new Error('Email already in use');
   const hash = await bcrypt.hash(password, 10);
-  return await userRepo.createUser(email, hash);
+  return await userRepo.createUser(email, hash, 'Guest', details);
 }
 
 export async function loginUser(email, password) {

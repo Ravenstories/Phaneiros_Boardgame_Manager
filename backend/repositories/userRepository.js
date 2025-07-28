@@ -20,10 +20,10 @@ export async function getUserById(id) {
   return data;
 }
 
-export async function createUser(email, password_hash, role = 'Guest') {
+export async function createUser(email, password_hash, role = 'Guest', extra = {}) {
   const { data, error } = await supabase
     .from('users')
-    .insert({ email, password_hash, role })
+    .insert({ email, password_hash, role, ...extra })
     .select('id, email, password_hash, role')
     .single();
   if (error) throw new Error(error.message);

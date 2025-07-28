@@ -6,9 +6,9 @@ const router = express.Router();
 router.use(express.json());
 
 router.post('/signup', async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, ...details } = req.body;
   try {
-    const user = await userService.registerUser(email, password);
+    const user = await userService.registerUser(email, password, details);
     res.status(201).json(user);
   } catch (err) {
     res.status(400).json({ error: err.message });

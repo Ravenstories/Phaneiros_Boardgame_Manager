@@ -1,8 +1,8 @@
 import { httpPost, httpPut, httpDelete, httpGet } from '../httpService.js';
 import { getToken } from '../userStore.js';
 
-export async function signupUser(email, password) {
-  return await httpPost('/api/signup', { email, password });
+export async function signupUser(signupData) {
+  return await httpPost('/api/signup', signupData);
 }
 
 export async function loginUser(email, password) {
