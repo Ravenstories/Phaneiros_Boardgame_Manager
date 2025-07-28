@@ -1,5 +1,6 @@
 import request from 'supertest';
 import { jest } from '@jest/globals';
+import jwt from 'jsonwebtoken';
 
 process.env.JWT_SECRET = process.env.JWT_SECRET || 'testsecret';
 
@@ -27,6 +28,22 @@ describe('User signup endpoint', () => {
       .expect(201);
   });
 
+ afterAll(done => {
+    server?.close(done);
+    if (!server) done();
+  });
+});
+
+describe('User role update endpoint', () => {
+  it('forbids non-admins', async () => {
+    const token = jwt.sign({ id: 1, role: 'user' }, process.env.JWT_SECRET);
+    await request(app)
+      .put('/api/users/2/role')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ role: 'admin' })
+      .expect(403);
+  });
+  
   afterAll(done => {
     server?.close(done);
     if (!server) done();

@@ -33,12 +33,11 @@
 <body>
 
     <nav class="main-nav d-flex justify-content-center bg-black">
-        <ul class="nav text-center list-unstyled"> 
+        <ul class="nav text-center list-unstyled">
             <li><a class="nav-link display-heading text-white" href="#" data-page="start">Start</a></li>
             <li><a class="nav-link display-heading text-white" href="#" data-page="mapScreen">Map</a></li>
-            <li><a class="nav-link display-heading text-white" href="#" data-page="userDashboard">Dashboard</a></li>
-            <li><a class="nav-link display-heading text-white" href="#" data-page="login">Login</a></li>
-            <li><a class="nav-link display-heading text-white" href="#" data-page="signup">Signup</a></li>
+            <li id="nav-dashboard"><a class="nav-link display-heading text-white" href="#" data-page="userDashboard">Dashboard</a></li>
+            <li><a id="account-link" class="nav-link display-heading text-white" href="#" data-page="login">Login / Signup</a></li>
         </ul>
     </nav>
 
@@ -58,5 +57,6 @@
 
     <!-- JS -->
     <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/ui/updateHeader.js" type="module"></script>
 </body>
 </html>

@@ -36,6 +36,12 @@ export async function updateUser(id, updateData) {
   return data;
 }
 
+export async function updateRole(id, role) {
+  const { data, error } = await supabase.from('users').update({ role }).eq('id', id).select().single();
+  if (error) throw new Error(error.message);
+  return data;
+}
+
 export async function deleteUser(id) {
   const { error } = await supabase.from('users').delete().eq('id', id);
   if (error) throw new Error(error.message);

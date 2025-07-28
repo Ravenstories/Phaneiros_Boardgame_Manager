@@ -19,14 +19,14 @@ export async function loginUser(email, password) {
   if (!user) throw new Error('Invalid email or password');
   const valid = await bcrypt.compare(password, user.password_hash);
   if (!valid) throw new Error('Invalid email or password');
-  return jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
+  return jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
 }
 
 export async function verifyToken(token) {
   const payload = jwt.verify(token, JWT_SECRET);
   const user = await userRepo.getUserById(payload.id);
   if (!user) throw new Error('Invalid user');
-  return { id: user.id, email: user.email };
+  return { id: user.id, email: user.email, role: payload.role };
 }
 
 export async function updateUser(id, updateData) {
@@ -35,4 +35,8 @@ export async function updateUser(id, updateData) {
 
 export async function deleteUser(id) {
   return await userRepo.deleteUser(id);
+}
+
+export async function updateRole(id, role) {
+  return await userRepo.updateRole(id, role);
 }

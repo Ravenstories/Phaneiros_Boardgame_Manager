@@ -1,4 +1,5 @@
-import { loginUser } from '../../services/api/userAPI.js';
+import { loginUser, getSession } from '../../services/api/userAPI.js';
+import { login } from '../../services/userStore.js';
 
 document.getElementById('login-form').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -6,7 +7,9 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
   const password = document.getElementById('password').value;
   try {
     await loginUser(email, password);
-    window.location.href = '/pages/Start/start.html';
+    const user = await getSession();
+    if (user) login(user);
+    window.location.href = '/';
   } catch (err) {
     alert(err.message);
   }

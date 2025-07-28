@@ -1,9 +1,10 @@
-<main id="page-content">
-  <h2>Sign Up</h2>
-  <form id="signup-form">
-    <input type="email" name="email" placeholder="Email" required />
-    <input type="password" name="password" placeholder="Password" required />
-    <button type="submit">Create Account</button>
+<main id="page-content" class="container mt-5" style="max-width: 400px;">
+  <h2 class="mb-3">Sign Up</h2>
+  <form id="signup-form" class="vstack gap-2">
+    <input type="email" id="email" name="email" class="form-control" placeholder="Email" required />
+    <input type="password" id="password" name="password" class="form-control" placeholder="Password" required />
+    <input type="password" id="confirm-password" class="form-control" placeholder="Confirm Password" required />
+    <button type="submit" class="btn btn-primary w-100">Create Account</button>
   </form>
-  <p id="signup-error" style="color:red;"></p>
+  <p id="signup-error" class="text-danger mt-2"></p>
 </main>

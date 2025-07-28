@@ -1,5 +1,6 @@
 import express from 'express';
 import * as userService from '../services/userService.js';
+import jwt from 'jsonwebtoken';
 
 const router = express.Router();
 router.use(express.json());
@@ -32,6 +33,21 @@ router.get('/session', async (req, res) => {
     res.status(200).json(user);
   } catch (err) {
     res.status(401).json({ error: err.message });
+  }
+});
+
+router.put('/users/:id/role', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ error: 'No token provided' });
+  try {
+    const payload = jwt.verify(authHeader.split(' ')[1], process.env.JWT_SECRET);
+    if (payload.role !== 'admin') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+    const updated = await userService.updateRole(req.params.id, req.body.role);
+    res.status(200).json(updated);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
   }
 });
 
