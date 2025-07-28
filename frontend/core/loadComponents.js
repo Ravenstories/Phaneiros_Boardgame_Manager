@@ -9,11 +9,12 @@ const PAGE_BASE = 'pages';
 const LAYOUT_BASE = 'layout';
 const COMPONENTS = {
   pages: {
-    start:        `${PAGE_BASE}/Start/start`,
-    mapScreen:    `${PAGE_BASE}/MapScreen/mapScreen`,
-    login:        `${PAGE_BASE}/Login/login`,
-    signup:       `${PAGE_BASE}/Signup/signup`,
-    gameChooser:  `${PAGE_BASE}/GameChooser/gameChooser`,
+    start:          `${PAGE_BASE}/Start/start`,
+    mapScreen:      `${PAGE_BASE}/MapScreen/mapScreen`,
+    login:          `${PAGE_BASE}/Login/login`,
+    signup:         `${PAGE_BASE}/Signup/signup`,
+    gameChooser:    `${PAGE_BASE}/GameChooser/gameChooser`,
+    userDashboard:  `${PAGE_BASE}/UserDashboard/userDashboard`,
   },
   layout: {
     header: `${LAYOUT_BASE}/Header/header`,

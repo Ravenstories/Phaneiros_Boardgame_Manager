@@ -1,4 +1,5 @@
 import { httpPost, httpPut, httpDelete, httpGet } from '../httpService.js';
+import { getToken } from '../userStore.js';
 
 export async function signupUser(email, password) {
   return await httpPost('/api/signup', { email, password });
@@ -11,7 +12,9 @@ export async function loginUser(email, password) {
 }
 
 export async function getSession() {
-  return await httpGet('/api/session');
+  const token = getToken();
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+  return await httpGet('/api/session', headers);
 }
 
 export async function updateUser(id, updateData) {
