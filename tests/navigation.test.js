@@ -1,17 +1,6 @@
 /** @jest-environment jsdom */
 import { jest } from '@jest/globals';
-import fs from 'fs';
-import path from 'path';
-
 const ts = 12345;
-
-beforeAll(() => {
-  try {
-    fs.symlinkSync(path.resolve('frontend/pages'), '/pages');
-  } catch (err) {
-    // ignore if already exists
-  }
-});
 
 beforeEach(() => {
   jest.resetModules();
@@ -35,10 +24,10 @@ afterEach(() => {
 });
 
 test('navigate to gameChooser without token redirects to login page', async () => {
-  jest.unstable_mockModule('/pages/Login/login.js', () => ({ default: () => {} }));
-  jest.unstable_mockModule('/pages/GameChooser/gameChooser.js', () => ({ default: () => {} }));
+  jest.unstable_mockModule(`/pages/Login/login.js?v=${ts}`, () => ({ default: () => {} }), { virtual: true });
+  jest.unstable_mockModule(`/pages/GameChooser/gameChooser.js?v=${ts}`, () => ({ default: () => {} }), { virtual: true });
 
-  const { navigateTo } = await import('../../frontend/core/loadComponents.js');
+  const { navigateTo } = await import('../frontend/core/loadComponents.js');
   navigateTo('gameChooser');
   await new Promise(r => setTimeout(r, 0));
 
@@ -47,17 +36,17 @@ test('navigate to gameChooser without token redirects to login page', async () =
 });
 
 test('login then navigate to gameChooser loads the page', async () => {
-  jest.unstable_mockModule('/pages/Login/login.js', () => ({ default: () => {} }));
-  jest.unstable_mockModule('/pages/GameChooser/gameChooser.js', () => ({ default: () => {} }));
-  jest.unstable_mockModule('../../frontend/services/httpService.js', () => ({
+  jest.unstable_mockModule(`/pages/Login/login.js?v=${ts}`, () => ({ default: () => {} }), { virtual: true });
+  jest.unstable_mockModule(`/pages/GameChooser/gameChooser.js?v=${ts}`, () => ({ default: () => {} }), { virtual: true });
+  jest.unstable_mockModule('../frontend/services/httpService.js', () => ({
     httpPost: jest.fn(async () => ({ token: 't123' })),
     httpGet: jest.fn(),
     httpPut: jest.fn(),
     httpDelete: jest.fn()
   }));
 
-  const { loginUser } = await import('../../frontend/services/api/userAPI.js');
-  const { navigateTo } = await import('../../frontend/core/loadComponents.js');
+  const { loginUser } = await import('../frontend/services/api/userAPI.js');
+  const { navigateTo } = await import('../frontend/core/loadComponents.js');
 
   await loginUser('a@b.com', 'pw');
   navigateTo('gameChooser');
