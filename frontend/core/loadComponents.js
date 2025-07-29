@@ -3,6 +3,8 @@
  * Clean structure for loading pages, layout parts (header/footer), and more.
  * Handles navigation, history, and dynamic imports.
  */
+import { getToken } from '../services/userStore.js';
+const IS_NODE = import.meta.url.startsWith('file:');
 const APP_EL = document.getElementById('app');
 if (!APP_EL) throw new Error('[loader] #app element not found');
 const PAGE_BASE = 'pages';
@@ -53,7 +55,10 @@ export async function loadPage(name) {
   const html = await fetchFragment(`${path}.html`);
   APP_EL.innerHTML = html;
 
-  const mod = await import(`/${path}.js?v=${Date.now()}`);
+  const modPath = IS_NODE
+    ? new URL(`../${path}.js?v=${Date.now()}`, import.meta.url)
+    : `/${path}.js?v=${Date.now()}`;
+  const mod = await import(modPath);
   currentModule = mod;
 
   if (typeof mod.default === 'function') {
@@ -72,7 +77,10 @@ export async function loadLayout(name, targetSelector) {
   const html = await fetchFragment(`${path}.html`);
   target.innerHTML = html;
 
-  const mod = await import(`/${path}.js?v=${Date.now()}`);
+  const modPath = IS_NODE
+    ? new URL(`../${path}.js?v=${Date.now()}`, import.meta.url)
+    : `/${path}.js?v=${Date.now()}`;
+  const mod = await import(modPath);
   if (typeof mod.default === 'function') {
     mod.default({ target });
   }
@@ -98,11 +106,97 @@ window.addEventListener('popstate', (ev) => {
   loadPage(screen);
 });
 
+
+
 /**
- * Initial page load
- */
+ * Component Loader & Router
+ * Clean structure for loading pages, layout parts (header/footer), and more.
+ * Handles navigation, history, and dynamic imports.
+ 
+const APP_EL = document.getElementById('app');
+if (!APP_EL) throw new Error('[loader] #app element not found');
+const PAGE_BASE = 'pages';
+const LAYOUT_BASE = 'layout';
+const COMPONENTS = {
+  pages: {
+    start:          `${PAGE_BASE}/Start/start`,
+    mapScreen:      `${PAGE_BASE}/MapScreen/mapScreen`,
+    login:          `${PAGE_BASE}/Login/login`,
+    signup:         `${PAGE_BASE}/Signup/signup`,
+    gameChooser:    `${PAGE_BASE}/GameChooser/gameChooser`,
+    userDashboard:  `${PAGE_BASE}/UserDashboard/userDashboard`,
+  },
+  layout: {
+    header: `${LAYOUT_BASE}/Header/header`,
+    footer: `${LAYOUT_BASE}/Footer/footer`
+  }
+};
+
+let currentModule = null;
+
+
+export function navigateTo(name) {
+  const url = `/${name}`;
+  if (location.pathname !== url) {
+    history.pushState({ screen: name }, '', url);
+  }
+  loadPage(name);
+}
+
+
+export async function loadPage(name) {
+  const path = COMPONENTS.pages[name] || COMPONENTS.pages.start;
+  console.log(`[loader] loading page: ${path}`);
+
+  if (typeof currentModule?.cleanup === 'function') {
+    currentModule.cleanup();
+  }
+
+  const html = await fetchFragment(`${path}.html`);
+  APP_EL.innerHTML = html;
+
+  const mod = await import(`/${path}.js?v=${Date.now()}`);
+  currentModule = mod;
+
+  if (typeof mod.default === 'function') {
+    mod.default({ target: APP_EL });
+  }
+}
+
+
+export async function loadLayout(name, targetSelector) {
+  const path = COMPONENTS.layout[name];
+  const target = document.querySelector(targetSelector);
+  if (!path || !target) return;
+
+  const html = await fetchFragment(`${path}.html`);
+  target.innerHTML = html;
+
+  const mod = await import(`/${path}.js?v=${Date.now()}`);
+  if (typeof mod.default === 'function') {
+    mod.default({ target });
+  }
+}
+
+
+async function fetchFragment(url) {
+  const res = await fetch(url, { cache: 'no-store' });
+  if (!res.ok) throw new Error(`HTTP ${res.status} while fetching ${url}`);
+  const txt = await res.text();
+  const doc = new DOMParser().parseFromString(txt, 'text/html');
+  const main = doc.querySelector('main#page-content') || doc.body;
+  return main.innerHTML;
+}
+
+
+window.addEventListener('popstate', (ev) => {
+  const screen = ev.state?.screen || 'start';
+  loadPage(screen);
+});
+
+
 document.addEventListener('DOMContentLoaded', () => {
-  const screen = location.pathname.slice(1) || 'welcome';
+  const screen = location.pathname.slice(1) || 'start';
   history.replaceState({ screen }, location.pathname);
   loadPage(screen);
 });
@@ -117,9 +211,8 @@ document.addEventListener('click', (e) => {
 });
 
 
-/**
- * Expose for global use in inline handlers
- */
 window.navigateTo = navigateTo;
 window.loadPage = loadPage;
 window.loadLayout = loadLayout;
+
+*/

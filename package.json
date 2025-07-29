@@ -30,6 +30,9 @@
     "supertest": "^7.1.1"
   },
   "jest": {
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^/pages/(.*)\\.js\\?v=.*$": "<rootDir>/frontend/pages/$1.js"
+    }
   }
 }
