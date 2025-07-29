@@ -20,7 +20,6 @@ const COMPONENTS = {
     userDashboard:      `${PAGE_BASE}/UserDashboard/userDashboard`,
     adminPanel:         `${PAGE_BASE}/AdminPanel/adminPanel`,
     gameMasterScreen:   `${PAGE_BASE}/GameMasterScreen/gameMasterScreen`,
-    gameMaster:         `${PAGE_BASE}/GameMasterScreen/gameMasterScreen`,
   },
   layout: {
     header: `${LAYOUT_BASE}/Header/header`,
@@ -49,25 +48,27 @@ export function navigateTo(name) {
  * Load a page component into #app
  */
 export async function loadPage(name) {
-  const path = COMPONENTS.pages[name] || COMPONENTS.pages.welcome;
-  //console.log(`[loader] loading page: ${path}`);
+  const def = COMPONENTS.pages[name] || COMPONENTS.pages.welcome;
+  const jsPath = typeof def === 'string' ? def : def.js;
+  const htmlPath = typeof def === 'string' ? def : def.html;
+  //console.log(`[loader] loading page: ${jsPath}`);
 
   if (typeof currentModule?.cleanup === 'function') {
     currentModule.cleanup();
   }
 
-  const html = await fetchFragment(`${path}.html`);
+  const html = await fetchFragment(`${htmlPath}.html`);
   APP_EL.innerHTML = html;
 
   const modPath = IS_NODE && !IS_JSDOM
-    ? new URL(`../${path}.js?v=${Date.now()}`, import.meta.url)
-    : `/${path}.js?v=${Date.now()}`;
+    ? new URL(`../${jsPath}.js?v=${Date.now()}`, import.meta.url)
+    : `/${jsPath}.js?v=${Date.now()}`;
   let mod;
   try {
     mod = await import(modPath);
   } catch (err) {
     try {
-      mod = await import(new URL(`../${path}.js?v=${Date.now()}`, import.meta.url));
+      mod = await import(new URL(`../${jsPath}.js?v=${Date.now()}`, import.meta.url));
     } catch (err2) {
       throw err;
     }
