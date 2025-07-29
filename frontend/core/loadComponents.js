@@ -28,6 +28,10 @@ let currentModule = null;
  * Public API: Navigate to a page (with history tracking)
  */
 export function navigateTo(name) {
+  // Login redirect if no token for test
+   if (name === 'gameChooser' && !getToken()) {
+    name = 'login';
+  }
   const url = `/${name}`;
   if (location.pathname !== url) {
     history.pushState({ screen: name }, '', url);
