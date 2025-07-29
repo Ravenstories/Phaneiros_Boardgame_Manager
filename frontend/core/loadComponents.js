@@ -4,7 +4,8 @@
  * Handles navigation, history, and dynamic imports.
  */
 import { getToken } from '../services/userStore.js';
-const IS_NODE = import.meta.url.startsWith('file:');
+const IS_NODE = typeof window === 'undefined';
+const IS_JSDOM = !IS_NODE && navigator.userAgent?.includes('jsdom');
 const APP_EL = document.getElementById('app');
 if (!APP_EL) throw new Error('[loader] #app element not found');
 const PAGE_BASE = 'pages';
@@ -19,6 +20,7 @@ const COMPONENTS = {
     userDashboard:      `${PAGE_BASE}/UserDashboard/userDashboard`,
     adminPanel:         `${PAGE_BASE}/AdminPanel/adminPanel`,
     gameMasterScreen:   `${PAGE_BASE}/GameMasterScreen/gameMasterScreen`,
+    gameMaster:         `${PAGE_BASE}/GameMasterScreen/gameMasterScreen`,
   },
   layout: {
     header: `${LAYOUT_BASE}/Header/header`,
@@ -57,10 +59,19 @@ export async function loadPage(name) {
   const html = await fetchFragment(`${path}.html`);
   APP_EL.innerHTML = html;
 
-  const modPath = IS_NODE
+  const modPath = IS_NODE && !IS_JSDOM
     ? new URL(`../${path}.js?v=${Date.now()}`, import.meta.url)
     : `/${path}.js?v=${Date.now()}`;
-  const mod = await import(modPath);
+  let mod;
+  try {
+    mod = await import(modPath);
+  } catch (err) {
+    try {
+      mod = await import(new URL(`../${path}.js?v=${Date.now()}`, import.meta.url));
+    } catch (err2) {
+      throw err;
+    }
+  }
   currentModule = mod;
 
   if (typeof mod.default === 'function') {
@@ -79,10 +90,19 @@ export async function loadLayout(name, targetSelector) {
   const html = await fetchFragment(`${path}.html`);
   target.innerHTML = html;
 
-  const modPath = IS_NODE
+  const modPath = IS_NODE && !IS_JSDOM
     ? new URL(`../${path}.js?v=${Date.now()}`, import.meta.url)
     : `/${path}.js?v=${Date.now()}`;
-  const mod = await import(modPath);
+  let mod;
+  try {
+    mod = await import(modPath);
+  } catch (err) {
+    try {
+      mod = await import(new URL(`../${path}.js?v=${Date.now()}`, import.meta.url));
+    } catch (err2) {
+      throw err;
+    }
+  }
   if (typeof mod.default === 'function') {
     mod.default({ target });
   }
@@ -107,20 +127,3 @@ window.addEventListener('popstate', (ev) => {
   const screen = ev.state?.screen || 'welcome';
   loadPage(screen);
 });
-
-document.addEventListener('DOMContentLoaded', () => {
-  const screen = location.pathname.slice(1) || 'welcome';
-  history.replaceState({ screen }, location.pathname);
-  loadPage(screen);
-});
-
-document.addEventListener('click', (e) => {
-  const link = e.target.closest('[data-page]');
-  if (!link) return;
-  e.preventDefault();
-  navigateTo(link.dataset.page);
-});
-
-window.navigateTo = navigateTo;
-window.loadPage = loadPage;
-window.loadLayout = loadLayout;

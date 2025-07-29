@@ -64,7 +64,7 @@ test('login then navigate to gameChooser loads the page', async () => {
 });
 
 test('navigate to admin panel loads fragment', async () => {
-  jest.unstable_mockModule(`/pages/AdminPanel/AdminPanel.js?v=${ts}`, () => ({ default: () => {} }), { virtual: true });
+  jest.unstable_mockModule(`/pages/AdminPanel/adminPanel.js?v=${ts}`, () => ({ default: () => {} }), { virtual: true });
   const { navigateTo } = await import('../frontend/core/loadComponents.js');
   navigateTo('adminPanel');
   await new Promise(r => setTimeout(r, 0));
@@ -73,7 +73,7 @@ test('navigate to admin panel loads fragment', async () => {
 });
 
 test('navigate to game master screen loads fragment', async () => {
-  jest.unstable_mockModule(`/pages/GameMasterScreen/GameMasterScreen.js?v=${ts}`, () => ({ default: () => {} }), { virtual: true });
+  jest.unstable_mockModule(`/pages/GameMasterScreen/gameMasterScreen.js?v=${ts}`, () => ({ default: () => {} }), { virtual: true });
   const { navigateTo } = await import('../frontend/core/loadComponents.js');
   navigateTo('gameMaster');
   await new Promise(r => setTimeout(r, 0));
