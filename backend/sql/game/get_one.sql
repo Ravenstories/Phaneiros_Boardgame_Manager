@@ -1,4 +1,5 @@
 select game_id,
+       game_name,
        game_type,
        created_at,
        status                -- add any extra columns you want to show

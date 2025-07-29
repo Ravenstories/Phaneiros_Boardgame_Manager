@@ -12,7 +12,7 @@ const rpcMock = jest.fn(async (_proc, args) => {
     return { data: [{ x: 0, y: 0, terrain_type_id: 1 }], error: null };
   }
   // games list
-  return { data: [{ game_id: 1, game_type: 'kingdom' }], error: null };
+  return { data: [{ game_id: 1, game_type: 'kingdom', game_name: 'Test Game' }], error: null };
 });
 
 jest.unstable_mockModule('@supabase/supabase-js', () => ({

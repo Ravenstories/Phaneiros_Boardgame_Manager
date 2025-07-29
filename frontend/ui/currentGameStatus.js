@@ -17,9 +17,9 @@ export async function renderCurrentGameStatus() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const game = await res.json();
 
+    const name  = game.game_name || `Game ${game.game_id}`;
     container.innerHTML =
-      `Game <strong>#${game.game_id}</strong> `
-    + `(${game.game_type}) – `
+      `${name} <span class="text-muted">(${game.game_type})</span> – `
     + new Date(game.created_at).toLocaleString();
 
   } catch (err) {

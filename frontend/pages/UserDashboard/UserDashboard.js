@@ -4,6 +4,8 @@ import { gameRegistry } from '../../services/gameRegistry.js';
 export default async function init() {
   const form = document.getElementById('user-form');
   const msgEl = document.getElementById('user-msg');
+  const editBtn = document.getElementById('edit-btn');
+  const saveBtn = document.getElementById('save-btn');
   const gamesListEl = document.getElementById('games-list');
   const gamesEmptyEl = document.getElementById('games-empty');
 
@@ -35,11 +37,14 @@ export default async function init() {
       user = await updateUser(user.id, updateData);
       msgEl.textContent = 'Saved';
       fillForm(user);
+      setEditing(false);
     } catch (err) {
       console.error('Failed to update user', err);
-      msgEl.textContent = err.message;
+      msgEl.textContent = 'Failed to update user: ' + err.message;
     }
   });
+
+  editBtn.addEventListener('click', () => setEditing(true));
 
   try {
     const res = await fetch('/api/games');
@@ -51,7 +56,8 @@ export default async function init() {
         const li = document.createElement('li');
         li.className = 'list-group-item';
         const label = gameRegistry[g.game_type]?.label || g.game_type;
-        li.textContent = `${g.game_id}: ${label}`;
+        const name  = g.game_name || `Game ${g.game_id}`;
+        li.textContent = `${name}: ${label}`;
         gamesListEl.appendChild(li);
       }
     } else {
@@ -70,5 +76,14 @@ export default async function init() {
     form.phone.value = u.phone || '';
     form.games.value = u.requested_games || '';
     form.role.value = u.requested_role || u.role || 'Player';
+    setEditing(false);
+  }
+
+  function setEditing(on) {
+    ['name','birthdate','address','phone','games','role'].forEach(id => {
+      form[id].disabled = !on;
+    });
+    saveBtn.disabled = !on;
+    editBtn.disabled = on;
   }
 }

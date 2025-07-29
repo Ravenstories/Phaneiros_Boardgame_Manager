@@ -5,18 +5,21 @@
         <div class="card-body">
           <h2 class="card-title h4 mb-3">User Info</h2>
           <form id="user-form" class="vstack gap-2">
-            <input type="text" id="name" class="form-control" placeholder="Name" />
+            <input type="text" id="name" class="form-control" placeholder="Name" disabled />
             <input type="email" id="email" class="form-control" placeholder="Email" readonly />
-            <input type="date" id="birthdate" class="form-control" />
-            <input type="text" id="address" class="form-control" placeholder="Address" />
-            <input type="tel" id="phone" class="form-control" placeholder="Phone" />
-            <textarea id="games" class="form-control" placeholder="Requested games" rows="2"></textarea>
-            <select id="role" class="form-select">
+            <input type="date" id="birthdate" class="form-control" disabled />
+            <input type="text" id="address" class="form-control" placeholder="Address" disabled />
+            <input type="tel" id="phone" class="form-control" placeholder="Phone" disabled />
+            <textarea id="games" class="form-control" placeholder="Requested games" rows="2" disabled></textarea>
+            <select id="role" class="form-select" disabled>
               <option value="Player">Player</option>
               <option value="Game Master">Game Master</option>
               <option value="Guest">Guest</option>
             </select>
-            <button type="submit" class="btn btn-primary">Save</button>
+            <div class="d-flex gap-2">
+              <button type="button" id="edit-btn" class="btn btn-secondary">Change</button>
+              <button type="submit" id="save-btn" class="btn btn-primary" disabled>Save</button>
+            </div>
             <p id="user-msg" class="mt-2 text-success"></p>
           </form>
         </div>

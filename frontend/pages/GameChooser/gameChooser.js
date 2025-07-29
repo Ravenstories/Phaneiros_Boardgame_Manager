@@ -99,7 +99,8 @@ function renderGameList(games) {
     const tr = document.createElement('tr');
     tr.dataset.id = game.game_id;
     const label = gameRegistry[game.game_type]?.label || game.game_type;
-    tr.innerHTML = `<td>${formatDate(game.created_at)}</td><td>${label}</td>`;
+    const name  = game.game_name || `Game ${game.game_id}`;
+    tr.innerHTML = `<td>${formatDate(game.created_at)}</td><td>${label}</td><td>${name}</td>`;
     tr.addEventListener('click', () => {
       setGameId(game.game_id);
       // Optionally load a component here
