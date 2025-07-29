@@ -10,6 +10,7 @@ export const supabase = createClient(
   { schema }
 );
 
+/*
 async function runMigrations() {
   const migrations = [sqlHelper('users/create.sql')];
   for (const sql of migrations) {
@@ -21,3 +22,4 @@ async function runMigrations() {
 if (process.env.NODE_ENV !== 'test') {
   runMigrations();
 }
+*/

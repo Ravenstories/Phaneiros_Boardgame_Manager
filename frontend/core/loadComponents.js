@@ -9,7 +9,7 @@ const PAGE_BASE = 'pages';
 const LAYOUT_BASE = 'layout';
 const COMPONENTS = {
   pages: {
-    start:          `${PAGE_BASE}/Start/start`,
+    welcome:       `${PAGE_BASE}/Welcome/welcome`,
     mapScreen:      `${PAGE_BASE}/MapScreen/mapScreen`,
     login:          `${PAGE_BASE}/Login/login`,
     signup:         `${PAGE_BASE}/Signup/signup`,
@@ -39,7 +39,7 @@ export function navigateTo(name) {
  * Load a page component into #app
  */
 export async function loadPage(name) {
-  const path = COMPONENTS.pages[name] || COMPONENTS.pages.start;
+  const path = COMPONENTS.pages[name] || COMPONENTS.pages.welcome;
   console.log(`[loader] loading page: ${path}`);
 
   if (typeof currentModule?.cleanup === 'function') {
@@ -90,7 +90,7 @@ async function fetchFragment(url) {
  * Popstate: Back/forward browser buttons
  */
 window.addEventListener('popstate', (ev) => {
-  const screen = ev.state?.screen || 'start';
+  const screen = ev.state?.screen || 'welcome';
   loadPage(screen);
 });
 
@@ -98,7 +98,7 @@ window.addEventListener('popstate', (ev) => {
  * Initial page load
  */
 document.addEventListener('DOMContentLoaded', () => {
-  const screen = location.pathname.slice(1) || 'start';
+  const screen = location.pathname.slice(1) || 'welcome';
   history.replaceState({ screen }, location.pathname);
   loadPage(screen);
 });
