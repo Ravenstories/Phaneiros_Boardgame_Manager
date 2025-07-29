@@ -20,7 +20,7 @@ const COLORS   = {
 
 /* ── public API (called by loader or self-boot) -------------------------- */
 export default async function init({ target }) {
-  console.log('[MapScreen] init() called');
+  //console.log('[MapScreen] init() called');
   const board = target.querySelector('#map-board');
   if (!board || board.dataset.initialised) return;
   board.style.position = 'relative';

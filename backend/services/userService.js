@@ -11,7 +11,10 @@ export async function registerUser(email, password, details = {}) {
   const existing = await userRepo.getUserByEmail(email);
   if (existing) throw new Error('Email already in use');
   const hash = await bcrypt.hash(password, 10);
-  return await userRepo.createUser(email, hash, 'Guest', details);
+  const created = await userRepo.createUser(email, hash, 'Guest', details);
+  if (!created) return created;
+  const { password_hash, ...user } = created;
+  return user;
 }
 
 export async function loginUser(email, password) {
@@ -26,11 +29,14 @@ export async function verifyToken(token) {
   const payload = jwt.verify(token, JWT_SECRET);
   const user = await userRepo.getUserById(payload.id);
   if (!user) throw new Error('Invalid user');
-  return { id: user.id, email: user.email, role: payload.role };
+  const { password_hash, ...safe } = user;
+  return safe;
 }
 
 export async function updateUser(id, updateData) {
-  return await userRepo.updateUser(id, updateData);
+  const { password_hash, ...user } =
+    await userRepo.updateUser(id, updateData);
+  return user;
 }
 
 export async function deleteUser(id) {

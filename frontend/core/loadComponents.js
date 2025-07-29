@@ -46,7 +46,7 @@ export function navigateTo(name) {
  */
 export async function loadPage(name) {
   const path = COMPONENTS.pages[name] || COMPONENTS.pages.welcome;
-  console.log(`[loader] loading page: ${path}`);
+  //console.log(`[loader] loading page: ${path}`);
 
   if (typeof currentModule?.cleanup === 'function') {
     currentModule.cleanup();

@@ -1,23 +1,45 @@
-import { getSession } from '../../services/api/userAPI.js';
+import { getSession, updateUser } from '../../services/api/userAPI.js';
+import { gameRegistry } from '../../services/gameRegistry.js';
 
 export default async function init() {
-  const userInfoEl = document.getElementById('user-info');
+  const form = document.getElementById('user-form');
+  const msgEl = document.getElementById('user-msg');
   const gamesListEl = document.getElementById('games-list');
   const gamesEmptyEl = document.getElementById('games-empty');
 
   try {
-    const user = await getSession();
+    var user = await getSession();
     if (user && user.email) {
-      userInfoEl.textContent = `${user.email} (id: ${user.id})`;
+      fillForm(user);
     } else {
-      userInfoEl.textContent = 'Not logged in';
+      msgEl.textContent = 'Not logged in';
       return;
     }
   } catch (err) {
     console.error('Failed to load session', err);
-    userInfoEl.textContent = 'Could not load user info';
+    msgEl.textContent = 'Could not load user info';
     return;
   }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const updateData = {
+      name: form.name.value,
+      birthdate: form.birthdate.value,
+      address: form.address.value,
+      phone: form.phone.value,
+      requested_games: form.games.value,
+      requested_role: form.role.value,
+    };
+    try {
+      user = await updateUser(user.id, updateData);
+      msgEl.textContent = 'Saved';
+      fillForm(user);
+    } catch (err) {
+      console.error('Failed to update user', err);
+      msgEl.textContent = err.message;
+    }
+  });
 
   try {
     const res = await fetch('/api/games');
@@ -28,7 +50,8 @@ export default async function init() {
       for (const g of games) {
         const li = document.createElement('li');
         li.className = 'list-group-item';
-        li.textContent = `${g.game_id}: ${g.game_type}`;
+        const label = gameRegistry[g.game_type]?.label || g.game_type;
+        li.textContent = `${g.game_id}: ${label}`;
         gamesListEl.appendChild(li);
       }
     } else {
@@ -37,5 +60,15 @@ export default async function init() {
   } catch (err) {
     console.error('Failed to load games', err);
     gamesEmptyEl.textContent = 'Could not load games.';
+  }
+
+  function fillForm(u) {
+    form.name.value = u.name || '';
+    form.email.value = u.email || '';
+    form.birthdate.value = u.birthdate ? u.birthdate.slice(0,10) : '';
+    form.address.value = u.address || '';
+    form.phone.value = u.phone || '';
+    form.games.value = u.requested_games || '';
+    form.role.value = u.requested_role || u.role || 'Player';
   }
 }

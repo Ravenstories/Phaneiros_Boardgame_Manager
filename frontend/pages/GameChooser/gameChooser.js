@@ -7,6 +7,7 @@ import {
 } from '../../services/gameStore.js';
 
 import { renderCurrentGameStatus } from '../../ui/currentGameStatus.js';
+import { gameRegistry } from '../../services/gameRegistry.js';
 
 /* ───────────────────────── DOM References ───────────────────────── */
 const tbody       = document.querySelector('#game-table tbody');
@@ -97,7 +98,8 @@ function renderGameList(games) {
   games.forEach(game => {
     const tr = document.createElement('tr');
     tr.dataset.id = game.game_id;
-    tr.innerHTML = `<td>${formatDate(game.created_at)}</td><td>${game.game_type}</td>`;
+    const label = gameRegistry[game.game_type]?.label || game.game_type;
+    tr.innerHTML = `<td>${formatDate(game.created_at)}</td><td>${label}</td>`;
     tr.addEventListener('click', () => {
       setGameId(game.game_id);
       // Optionally load a component here

@@ -13,7 +13,7 @@ export async function getUserByEmail(email) {
 export async function getUserById(id) {
   const { data, error } = await supabase
     .from('users')
-    .select('id, email, password_hash, role')
+    .select('*')
     .eq('id', id)
     .single();
   if (error) throw new Error(error.message);
@@ -24,7 +24,7 @@ export async function createUser(email, password_hash, role = 'Guest', extra = {
   const { data, error } = await supabase
     .from('users')
     .insert({ email, password_hash, role, ...extra })
-    .select('id, email, password_hash, role')
+    .select('*')
     .single();
   if (error) throw new Error(error.message);
   return data;
