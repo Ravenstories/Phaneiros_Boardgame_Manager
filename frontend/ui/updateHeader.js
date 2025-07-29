@@ -64,6 +64,7 @@ export function updateHeader() {
       navItems.account.removeAttribute('data-page');
       navItems.account.onclick = () => {
         localStorage.clear();
+        window.navigateTo('welcome');
         location.reload();
       };
     } else {
