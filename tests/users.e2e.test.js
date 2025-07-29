@@ -44,6 +44,23 @@ describe('User role update endpoint', () => {
       .expect(403);
   });
   
+afterAll(done => {
+    server?.close(done);
+    if (!server) done();
+  });
+});
+
+describe('Game user assignment endpoint', () => {
+  it('requires admin token', async () => {
+    const token = jwt.sign({ id: 1, role: 'user' }, process.env.JWT_SECRET);
+    await request(app)
+      .post('/api/games/1/users')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ user_id: 2, role: 'player' })
+      .expect(403);
+  });
+
+
   afterAll(done => {
     server?.close(done);
     if (!server) done();

@@ -14,6 +14,12 @@ beforeEach(() => {
     if (url.endsWith('gameChooser.html')) {
       return { ok: true, text: async () => '<main id="page-content"><div id="game-chooser"></div></main>' };
     }
+    if (url.endsWith('AdminPanel.html')) {
+      return { ok: true, text: async () => '<main id="page-content"><div id="admin-panel"></div></main>' };
+    }
+    if (url.endsWith('GameMasterScreen.html')) {
+      return { ok: true, text: async () => '<main id="page-content"><div id="gm-screen"></div></main>' };
+    }
     return { ok: true, text: async () => '' };
   });
   jest.spyOn(Date, 'now').mockReturnValue(ts);
@@ -55,4 +61,22 @@ test('login then navigate to gameChooser loads the page', async () => {
   expect(localStorage.getItem('token')).toBe('t123');
   expect(window.location.pathname).toBe('/gameChooser');
   expect(document.querySelector('#game-chooser')).not.toBeNull();
+});
+
+test('navigate to admin panel loads fragment', async () => {
+  jest.unstable_mockModule(`/pages/AdminPanel/AdminPanel.js?v=${ts}`, () => ({ default: () => {} }), { virtual: true });
+  const { navigateTo } = await import('../frontend/core/loadComponents.js');
+  navigateTo('adminPanel');
+  await new Promise(r => setTimeout(r, 0));
+  expect(window.location.pathname).toBe('/adminPanel');
+  expect(document.querySelector('#admin-panel')).not.toBeNull();
+});
+
+test('navigate to game master screen loads fragment', async () => {
+  jest.unstable_mockModule(`/pages/GameMasterScreen/GameMasterScreen.js?v=${ts}`, () => ({ default: () => {} }), { virtual: true });
+  const { navigateTo } = await import('../frontend/core/loadComponents.js');
+  navigateTo('gameMaster');
+  await new Promise(r => setTimeout(r, 0));
+  expect(window.location.pathname).toBe('/gameMaster');
+  expect(document.querySelector('#gm-screen')).not.toBeNull();
 });

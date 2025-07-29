@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import * as userRepo from '../repositories/userRepository.js';
+import * as gameUserRepo from '../repositories/gameUserRepository.js';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
@@ -43,6 +44,26 @@ export async function deleteUser(id) {
   return await userRepo.deleteUser(id);
 }
 
+export async function listUsers() {
+  return await userRepo.listUsers();
+}
+
 export async function updateRole(id, role) {
   return await userRepo.updateRole(id, role);
+}
+
+export async function assignUserToGame(user_id, game_id, role) {
+  return await gameUserRepo.assignUserToGame(user_id, game_id, role);
+}
+
+export async function listGameUsers(game_id) {
+  return await gameUserRepo.listGameUsers(game_id);
+}
+
+export async function updateAssignment(user_id, game_id, role) {
+  return await gameUserRepo.updateAssignment(user_id, game_id, role);
+}
+
+export async function listUserGames(user_id) {
+  return await gameUserRepo.listUserGames(user_id);
 }

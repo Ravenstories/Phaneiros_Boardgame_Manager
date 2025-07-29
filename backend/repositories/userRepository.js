@@ -46,3 +46,9 @@ export async function deleteUser(id) {
   const { error } = await supabase.from('users').delete().eq('id', id);
   if (error) throw new Error(error.message);
 }
+
+export async function listUsers() {
+  const { data, error } = await supabase.from('users').select('*');
+  if (error) throw new Error(error.message);
+  return data;
+}
