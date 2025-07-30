@@ -4,6 +4,23 @@ import jwt from 'jsonwebtoken';
 
 process.env.JWT_SECRET = process.env.JWT_SECRET || 'testsecret';
 
+const mockUserService = {
+  registerUser: jest.fn(async () => ({})),
+  loginUser: jest.fn(),
+  verifyToken: jest.fn(),
+  updateUser: jest.fn(),
+  deleteUser: jest.fn(),
+  listUsers: jest.fn(),
+  updateRole: jest.fn(),
+  assignUserToGame: jest.fn(),
+  listGameUsers: jest.fn(async () => []),
+  updateAssignment: jest.fn(),
+  listUserGames: jest.fn(),
+  getGameAssignment: jest.fn(async () => null),
+};
+
+jest.unstable_mockModule('../backend/services/userService.js', () => mockUserService);
+
 jest.unstable_mockModule('@supabase/supabase-js', () => ({
   createClient: () => ({
     rpc: jest.fn(async () => ({ data: [], error: null })),
@@ -14,6 +31,7 @@ jest.unstable_mockModule('@supabase/supabase-js', () => ({
       delete: jest.fn().mockReturnThis(),
       eq: jest.fn().mockReturnThis(),
       single: jest.fn(async () => ({ data: null, error: null })),
+      maybeSingle: jest.fn(async () => ({ data: null, error: null })),
     })),
   }),
 }));
@@ -60,6 +78,31 @@ describe('Game user assignment endpoint', () => {
       .expect(403);
   });
 
+
+  afterAll(done => {
+    server?.close(done);
+    if (!server) done();
+  });
+});
+
+describe('Game users listing endpoint', () => {
+  it('forbids non-gm', async () => {
+    const token = jwt.sign({ id: 1, role: 'Player' }, process.env.JWT_SECRET);
+    await request(app)
+      .get('/api/games/1/users')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(403);
+  });
+
+  it('allows game master', async () => {
+    mockUserService.getGameAssignment.mockResolvedValueOnce({ role: 'Game Master' });
+    mockUserService.listGameUsers.mockResolvedValueOnce([]);
+    const token = jwt.sign({ id: 1, role: 'Game Master' }, process.env.JWT_SECRET);
+    await request(app)
+      .get('/api/games/1/users')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
+  });
 
   afterAll(done => {
     server?.close(done);

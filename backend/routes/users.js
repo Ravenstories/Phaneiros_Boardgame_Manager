@@ -122,8 +122,17 @@ router.post('/games/:id/users', requireAdmin, async (req, res) => {
   }
 });
 
-router.get('/games/:id/users', requireAdmin, async (req, res) => {
+router.get('/games/:id/users', async (req, res) => {
+  const auth = req.headers.authorization;
+  if (!auth) return res.status(401).json({ error: 'No token provided' });
   try {
+    const payload = jwt.verify(auth.split(' ')[1], process.env.JWT_SECRET);
+    if (payload.role !== 'admin') {
+      const assignment = await userService.getGameAssignment(payload.id, req.params.id);
+      if (!assignment || assignment.role !== 'Game Master') {
+        return res.status(403).json({ error: 'Admin or GM access required' });
+      }
+    }
     const list = await userService.listGameUsers(req.params.id);
     res.json(list);
   } catch (err) {

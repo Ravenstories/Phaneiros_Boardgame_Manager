@@ -67,3 +67,7 @@ export async function updateAssignment(user_id, game_id, role) {
 export async function listUserGames(user_id) {
   return await gameUserRepo.listUserGames(user_id);
 }
+
+export async function getGameAssignment(user_id, game_id) {
+  return await gameUserRepo.getAssignment(user_id, game_id);
+}

@@ -39,3 +39,14 @@ export async function listUserGames(user_id) {
   if (error) throw new Error(error.message);
   return data;
 }
+
+export async function getAssignment(user_id, game_id) {
+  const { data, error } = await supabase
+    .from('game_users')
+    .select('*')
+    .eq('user_id', user_id)
+    .eq('game_id', game_id)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  return data;
+}
