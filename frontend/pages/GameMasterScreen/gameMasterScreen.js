@@ -1,10 +1,11 @@
+import { getSession } from '../../services/api/userAPI.js';
+
 export default async function init() {
   const listEl = document.getElementById('gm-games');
   const msgEl = document.getElementById('gm-msg');
 
   try {
-    const res = await fetch('/api/session');
-    const user = await res.json();
+    const user = await getSession();
     const gamesRes = await fetch(`/api/users/${user.id}/games`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });

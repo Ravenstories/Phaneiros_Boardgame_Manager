@@ -1,10 +1,13 @@
+import { getSession } from '../../services/api/userAPI.js';
+
 export default async function init() {
   const table = document.getElementById('user-table').querySelector('tbody');
   const msgEl = document.getElementById('panel-msg');
 
   try {
+    const user = await getSession();
     const res = await fetch('/api/users', {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      headers: { Authorization: `Bearer ${user.token}` }
     });
     if (!res.ok) throw new Error(res.status);
     const users = await res.json();
