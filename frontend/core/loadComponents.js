@@ -128,3 +128,23 @@ window.addEventListener('popstate', (ev) => {
   const screen = ev.state?.screen || 'welcome';
   loadPage(screen);
 });
+
+// Boot on initial load
+document.addEventListener('DOMContentLoaded', () => {
+  const screen = location.pathname.slice(1) || 'welcome';
+  history.replaceState({ screen }, location.pathname);
+  loadPage(screen);
+});
+
+// Intercept navigation links
+document.addEventListener('click', (e) => {
+  const link = e.target.closest('[data-page]');
+  if (!link) return;
+  e.preventDefault();
+  navigateTo(link.dataset.page);
+});
+
+// expose for tests and inline scripts
+window.navigateTo = navigateTo;
+window.loadPage   = loadPage;
+window.loadLayout = loadLayout;

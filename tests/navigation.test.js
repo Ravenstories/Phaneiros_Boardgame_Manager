@@ -14,10 +14,10 @@ beforeEach(() => {
     if (url.endsWith('gameChooser.html')) {
       return { ok: true, text: async () => '<main id="page-content"><div id="game-chooser"></div></main>' };
     }
-    if (url.endsWith('AdminPanel.html')) {
+    if (url.endsWith('adminPanel.html')) {
       return { ok: true, text: async () => '<main id="page-content"><div id="admin-panel"></div></main>' };
     }
-    if (url.endsWith('GameMasterScreen.html')) {
+    if (url.endsWith('gameMasterScreen.html')) {
       return { ok: true, text: async () => '<main id="page-content"><div id="gm-screen"></div></main>' };
     }
     return { ok: true, text: async () => '' };
@@ -75,8 +75,8 @@ test('navigate to admin panel loads fragment', async () => {
 test('navigate to game master screen loads fragment', async () => {
   jest.unstable_mockModule(`/pages/GameMasterScreen/gameMasterScreen.js?v=${ts}`, () => ({ default: () => {} }), { virtual: true });
   const { navigateTo } = await import('../frontend/core/loadComponents.js');
-  navigateTo('gameMaster');
+  navigateTo('gameMasterScreen');
   await new Promise(r => setTimeout(r, 0));
-  expect(window.location.pathname).toBe('/gameMaster');
+  expect(window.location.pathname).toBe('/gameMasterScreen');
   expect(document.querySelector('#gm-screen')).not.toBeNull();
 });
