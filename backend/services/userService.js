@@ -13,9 +13,7 @@ export async function registerUser(email, password, details = {}) {
   if (existing) throw new Error('Email already in use');
   const hash = await bcrypt.hash(password, 10);
   const created = await userRepo.createUser(email, hash, 'Guest', details);
-  if (!created) return created;
-  const { password_hash, ...user } = created;
-  return user;
+  return created;
 }
 
 export async function loginUser(email, password) {

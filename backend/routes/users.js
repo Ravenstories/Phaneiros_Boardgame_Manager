@@ -10,7 +10,7 @@ function requireAdmin(req, res, next) {
   if (!auth) return res.status(401).json({ error: 'No token provided' });
   try {
     const payload = jwt.verify(auth.split(' ')[1], process.env.JWT_SECRET);
-    if (payload.role !== 'admin') {
+    if (payload.role !== 'Admin') {
       return res.status(403).json({ error: 'Admin access required' });
     }
     next();
@@ -64,7 +64,7 @@ router.put('/users/:id/role', requireAdmin, async (req, res) => {
   if (!authHeader) return res.status(401).json({ error: 'No token provided' });
   try {
     const payload = jwt.verify(authHeader.split(' ')[1], process.env.JWT_SECRET);
-    if (payload.role !== 'admin') {
+    if (payload.role !== 'Admin') {
       return res.status(403).json({ error: 'Admin access required' });
     }
     const updated = await userService.updateRole(req.params.id, req.body.role);
@@ -98,7 +98,7 @@ router.get('/users/:id/games', async (req, res) => {
   if (!auth) return res.status(401).json({ error: 'No token provided' });
   try {
     const payload = jwt.verify(auth.split(' ')[1], process.env.JWT_SECRET);
-    if (payload.role !== 'admin' && String(payload.id) !== req.params.id) {
+     if (payload.role !== 'Admin' && String(payload.id) !== req.params.id) {
       return res.status(403).json({ error: 'Forbidden' });
     }
     const list = await userService.listUserGames(req.params.id);
@@ -127,7 +127,7 @@ router.get('/games/:id/users', async (req, res) => {
   if (!auth) return res.status(401).json({ error: 'No token provided' });
   try {
     const payload = jwt.verify(auth.split(' ')[1], process.env.JWT_SECRET);
-    if (payload.role !== 'admin') {
+    if (payload.role !== 'Admin') {
       const assignment = await userService.getGameAssignment(payload.id, req.params.id);
       if (!assignment || assignment.role !== 'Game Master') {
         return res.status(403).json({ error: 'Admin or GM access required' });
