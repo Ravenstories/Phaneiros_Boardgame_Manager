@@ -1,7 +1,13 @@
 import { getSession } from '../../services/api/userAPI.js';
 import { getToken } from '../../services/userStore.js';
+import { hasPermission } from '../../services/roleService.js';
 
 export default async function init() {
+  if (!hasPermission('GameMaster' || 'Admin')) {
+    document.getElementById('gm-msg').textContent = 'Access denied';
+    return;
+  }
+
   const listEl = document.getElementById('gm-games');
   const msgEl = document.getElementById('gm-msg');
 

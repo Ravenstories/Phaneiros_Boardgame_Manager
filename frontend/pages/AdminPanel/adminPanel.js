@@ -1,7 +1,13 @@
 import { getSession } from '../../services/api/userAPI.js';
 import { getToken } from '../../services/userStore.js';
+import { hasPermission } from '../../services/roleService.js';
 
 export default async function init() {
+  if (!hasPermission('Admin')) {
+    document.getElementById('panel-msg').textContent = 'Access denied';
+    return;
+  }
+
   const table = document.getElementById('user-table').querySelector('tbody');
   const msgEl = document.getElementById('panel-msg');
 
