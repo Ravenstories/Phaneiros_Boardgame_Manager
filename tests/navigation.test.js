@@ -55,6 +55,7 @@ test('login then navigate to gameChooser loads the page', async () => {
   const { navigateTo } = await import('../frontend/core/loadComponents.js');
 
   await loginUser('a@b.com', 'pw');
+  localStorage.setItem('user', JSON.stringify({ role: 'Player' }));
   navigateTo('gameChooser');
   await new Promise(r => setTimeout(r, 0));
 
@@ -68,8 +69,8 @@ test('navigate to admin panel loads fragment', async () => {
   const { navigateTo } = await import('../frontend/core/loadComponents.js');
   navigateTo('adminPanel');
   await new Promise(r => setTimeout(r, 0));
-  expect(window.location.pathname).toBe('/adminPanel');
-  expect(document.querySelector('#admin-panel')).not.toBeNull();
+  expect(window.location.pathname).toBe('/login');
+  expect(document.querySelector('#login-form')).not.toBeNull();
 });
 
 test('navigate to game master screen loads fragment', async () => {
@@ -77,6 +78,6 @@ test('navigate to game master screen loads fragment', async () => {
   const { navigateTo } = await import('../frontend/core/loadComponents.js');
   navigateTo('gameMasterScreen');
   await new Promise(r => setTimeout(r, 0));
-  expect(window.location.pathname).toBe('/gameMasterScreen');
-  expect(document.querySelector('#gm-screen')).not.toBeNull();
+  expect(window.location.pathname).toBe('/login');
+  expect(document.querySelector('#login-form')).not.toBeNull();
 });

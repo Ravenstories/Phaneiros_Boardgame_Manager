@@ -3,7 +3,7 @@ import { getToken } from '../../services/userStore.js';
 import { hasPermission } from '../../services/roleService.js';
 
 export default async function init() {
-  if (!hasPermission('GameMaster' || 'Admin')) {
+  if (!hasPermission('Game Master')) {
     document.getElementById('gm-msg').textContent = 'Access denied';
     return;
   }

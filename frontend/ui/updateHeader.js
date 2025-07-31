@@ -1,4 +1,5 @@
-import { isLoggedIn } from '../services/userStore.js';
+import { isLoggedIn, getUser } from '../services/userStore.js';
+import { RolePriority } from '../services/roleService.js';
 
 export function updateHeader() {
   const loggedIn = isLoggedIn();
@@ -9,8 +10,14 @@ export function updateHeader() {
     account: document.getElementById('account-link'),
     home: document.getElementById('home-link'),
     game: document.getElementById('game-link'),
-    map: document.getElementById('map-link')
+    map: document.getElementById('map-link'),
+    admin: document.getElementById('admin-link'),
+    gm: document.getElementById('gm-link')
   };
+
+  const role = getUser()?.role || 'Guest';
+  const isAdmin = RolePriority[role] >= RolePriority.Admin;
+  const isGM = RolePriority[role] >= RolePriority['Game Master'];
 
   // Toggle visibility of links based on auth state
   if (navItems.dashboard) {
@@ -45,6 +52,14 @@ export function updateHeader() {
   if (navItems.map) {
     navItems.map.classList.toggle('d-none', !loggedIn);
     navItems.map.setAttribute('data-page', loggedIn ? 'mapScreen' : '');
+  }
+  
+  if (navItems.admin) {
+    navItems.admin.classList.toggle('d-none', !isAdmin);
+  }
+
+  if (navItems.gm) {
+    navItems.gm.classList.toggle('d-none', !isGM);
   }
 }
 

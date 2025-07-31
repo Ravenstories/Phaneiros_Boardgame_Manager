@@ -3,7 +3,8 @@
  * Clean structure for loading pages, layout parts (header/footer), and more.
  * Handles navigation, history, and dynamic imports.
  */
-import { getToken } from '../services/userStore.js';
+import { getToken, getUser } from '../services/userStore.js';
+import { RolePriority } from '../services/roleService.js';
 const IS_NODE = typeof window === 'undefined';
 const IS_JSDOM = !IS_NODE && navigator.userAgent?.includes('jsdom');
 const APP_EL = document.getElementById('app');
@@ -28,15 +29,31 @@ const COMPONENTS = {
 };
 
 let currentModule = null;
-
+const PUBLIC_PAGES = ['welcome', 'login', 'signup'];
 /**
  * Public API: Navigate to a page (with history tracking)
  */
 export function navigateTo(name) {
-  // Login redirect if no token for test
-   if (name === 'gameChooser' && !getToken()) {
+  const token = getToken();
+  const role = getUser()?.role || 'Guest';
+  const requiredRoles = {
+    adminPanel: 'Admin',
+    gameMasterScreen: 'Game Master'
+  };
+
+  if (!token && !PUBLIC_PAGES.includes(name)) {
     name = 'login';
   }
+
+  if (role === 'Guest' && !PUBLIC_PAGES.includes(name)) {
+    name = 'welcome';
+  }
+
+  const needed = requiredRoles[name];
+  if (needed && RolePriority[role] < RolePriority[needed]) {
+    name = 'welcome';
+  }
+
   const url = `/${name}`;
   if (location.pathname !== url) {
     history.pushState({ screen: name }, '', url);
