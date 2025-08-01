@@ -38,7 +38,7 @@ export function navigateTo(name) {
   const role = getUser()?.role || 'Guest';
   const requiredRoles = {
     adminPanel: 'Admin',
-    gameMasterScreen: 'Game Master'
+    //gameMasterScreen: 'Game Master'
   };
 
   if (!token && !PUBLIC_PAGES.includes(name)) {

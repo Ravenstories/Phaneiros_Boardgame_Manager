@@ -2,7 +2,6 @@
 import {
   getGameId,
   setGameId,
-  clearGameId,
   onChange
 } from '../../services/gameStore.js';
 
@@ -13,24 +12,19 @@ import { gameRegistry } from '../../services/gameRegistry.js';
 const tbody       = document.querySelector('#game-table tbody');
 const emptyMsg    = document.getElementById('empty-msg');
 const loadedTag   = document.getElementById('loaded-tag');
-const newBtn      = document.getElementById('btn-new');
 const refreshBtn  = document.getElementById('btn-refresh');
-const deleteBtn   = document.getElementById('btn-delete');
 
 /* ───────────────────────── Init ───────────────────────── */
 onChange(updateUI);
 updateUI(getGameId());
 loadGames();
-
-newBtn.addEventListener('click', handleCreateGame);
 refreshBtn.addEventListener('click', loadGames);
-deleteBtn.addEventListener('click', handleDeleteGame);
 
 /* ───────────────────────── UI Update ───────────────────────── */
 function updateUI(id) {
   const hasGame = Boolean(id);
   loadedTag.textContent = hasGame ? `Loaded: ${id}` : 'No game loaded.';
-  deleteBtn.disabled = !hasGame;
+  
   highlightSelectedRow(id);
 }
 
@@ -44,42 +38,6 @@ async function loadGames() {
   } catch (error) {
     console.error('[loadGames] Failed:', error);
     alert('Could not load games.');
-  } finally {
-    spin(false);
-  }
-}
-
-async function handleCreateGame() {
-  spin(true);
-  try {
-    const res = await fetch('/api/games', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ game_type: 'kingdom' })
-    });
-    const { game_id } = await res.json();
-    setGameId(game_id);
-    await loadGames();
-  } catch (error) {
-    console.error('[handleCreateGame] Failed:', error);
-    alert('Could not create game.');
-  } finally {
-    spin(false);
-  }
-}
-
-async function handleDeleteGame() {
-  const id = getGameId();
-  if (!id || !confirm('Delete this game?')) return;
-
-  spin(true);
-  try {
-    await fetch(`/api/games/${id}`, { method: 'DELETE' });
-    clearGameId();
-    await loadGames();
-  } catch (error) {
-    console.error('[handleDeleteGame] Failed:', error);
-    alert('Could not delete game.');
   } finally {
     spin(false);
   }

@@ -1,30 +1,54 @@
 import { getSession } from '../../services/api/userAPI.js';
 import { getToken } from '../../services/userStore.js';
-import { hasPermission } from '../../services/roleService.js';
+import { getGameId, setGameId } from '../../services/gameStore.js';
+
+let userId, token;
 
 export default async function init() {
-  if (!hasPermission('Game Master')) {
-    document.getElementById('gm-msg').textContent = 'Access denied';
-    return;
-  }
-
-  const listEl = document.getElementById('gm-games');
+  const newBtn = document.getElementById('gm-new');
+  const refreshBtn = document.getElementById('gm-refresh');
   const msgEl = document.getElementById('gm-msg');
+
+  newBtn.addEventListener('click', handleCreateGame);
+  refreshBtn.addEventListener('click', loadGames);
 
   try {
     const user = await getSession();
-    const token = getToken();
-    const gamesRes = await fetch(`/api/users/${user.id}/games`, {
+    userId = user.id;
+    token = getToken();
+    await loadGames();
+  } catch (err) {
+    msgEl.textContent = 'Failed to load games';
+    console.error(err);
+  }
+}
+
+async function loadGames() {
+  const listEl = document.getElementById('gm-games');
+  const msgEl = document.getElementById('gm-msg');
+  listEl.innerHTML = '';
+  msgEl.textContent = '';
+  try {
+    const res = await fetch(`/api/users/${userId}/games`, {
       headers: { Authorization: `Bearer ${token}` }
     });
-    if (!gamesRes.ok) throw new Error(gamesRes.status);
-    const games = await gamesRes.json();
-    for (const g of games) {
+    if (!res.ok) throw new Error(res.status);
+    const games = await res.json();
+    const gmGames = games.filter(g => g.role === 'Game Master');
+    if (!gmGames.length) {
+      msgEl.textContent = 'No managed games.';
+      return;
+    }
+    for (const g of gmGames) {
       const li = document.createElement('li');
       li.className = 'list-group-item';
-      li.innerHTML = `<div>Game ${g.game_id} - ${g.role}</div>`;
+      li.innerHTML = `<div>Game ${g.game_id}</div>`;
+      const delBtn = document.createElement('button');
+      delBtn.className = 'btn btn-sm btn-danger ms-2';
+      delBtn.textContent = 'Delete';
+      delBtn.addEventListener('click', () => handleDeleteGame(g.game_id));
+      li.appendChild(delBtn);
       listEl.appendChild(li);
-
       try {
         const usersRes = await fetch(`/api/games/${g.game_id}/users`, {
           headers: { Authorization: `Bearer ${token}` }
@@ -46,6 +70,32 @@ export default async function init() {
     }
   } catch (err) {
     msgEl.textContent = 'Failed to load games';
+    console.error(err);
+  }
+}
+
+async function handleCreateGame() {
+  try {
+    const res = await fetch('/api/games', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ game_type: 'kingdom' })
+    });
+    const { game_id } = await res.json();
+    setGameId(game_id);
+    await loadGames();
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+async function handleDeleteGame(id) {
+  if (!confirm('Delete this game?')) return;
+  try {
+    await fetch(`/api/games/${id}`, { method: 'DELETE' });
+    if (String(id) === getGameId()) setGameId(null);
+    await loadGames();
+  } catch (err) {
     console.error(err);
   }
 }
