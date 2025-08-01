@@ -1,11 +1,10 @@
-import jwt from 'jsonwebtoken';
-import { config } from '../config.js';
+import * as userService from '../services/userService.js';
 
-export function authenticate(req, res, next) {
+export async function authenticate(req, res, next) {
   const auth = req.headers.authorization;
   if (!auth) return res.status(401).json({ error: 'No token provided' });
   try {
-    req.user = jwt.verify(auth.split(' ')[1], config.jwtSecret);
+    req.user = await userService.verifyToken(auth.split(' ')[1]);
     next();
   } catch (err) {
     res.status(401).json({ error: err.message });

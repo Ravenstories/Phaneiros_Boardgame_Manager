@@ -36,6 +36,10 @@ jest.unstable_mockModule('@supabase/supabase-js', () => ({
   }),
 }));
 
+mockUserService.verifyToken.mockImplementation(async token =>
+  jwt.verify(token, process.env.JWT_SECRET)
+);
+
 const { app, server } = await import('../backend/server.js');
 
 describe('User signup endpoint', () => {
