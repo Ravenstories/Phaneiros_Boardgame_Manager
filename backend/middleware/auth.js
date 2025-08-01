@@ -30,3 +30,20 @@ export function requireSelfOrRole(role) {
     res.status(403).json({ error: `${role} access required` });
   };
 }
+
+export function requireGameMaster(param = 'game_id') {
+  return async function (req, res, next) {
+    if (!req.user) return res.status(401).json({ error: 'Not authenticated' });
+    if (req.user.role === 'Admin') return next();
+    try {
+      const assignment = await userService.getGameAssignment(
+        req.user.id,
+        req.params[param]
+      );
+      if (assignment && assignment.role === 'Game Master') return next();
+    } catch (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    res.status(403).json({ error: 'Admin or Game Master access required' });
+  };
+}

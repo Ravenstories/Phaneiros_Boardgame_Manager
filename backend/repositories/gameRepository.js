@@ -6,6 +6,8 @@ const SQL = {
   LIST   : sqlHelper('game/get_all.sql'),
   GET_ONE: sqlHelper('game/get_one.sql'),
   CREATE : sqlHelper('game/create.sql'),
+  DELETE : sqlHelper('game/delete.sql'),
+  UPDATE : sqlHelper('game/update.sql'),
 };
 
 export async function getAllGames () {
@@ -33,4 +35,22 @@ export async function createGame (gameType = 'kingdom') {
     { sql_text: SQL.CREATE, params: { gameType } });
   if (error) throw new Error(error.message);
   return data[0].game_id;
+}
+
+export async function deleteGame (gameId) {
+  const { data, error } = await supabase.rpc('exec_sql', {
+    sql_text: SQL.DELETE,
+    params  : { game_id: gameId },     // snake_case ⇄ :game_id
+  });
+  if (error) throw new Error(error.message);
+  return data[0].game_id;
+}
+
+export async function updateGame (gameId, updates) {
+  const { data, error } = await supabase.rpc('exec_sql', {
+    sql_text: SQL.UPDATE,
+    params  : { game_id: gameId, ...updates }, // snake_case ⇄ :game_id
+  });
+  if (error) throw new Error(error.message);
+  return data[0];
 }

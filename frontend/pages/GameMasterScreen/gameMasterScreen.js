@@ -78,7 +78,10 @@ async function handleCreateGame() {
   try {
     const res = await fetch('/api/games', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
       body: JSON.stringify({ game_type: 'kingdom' })
     });
     const { game_id } = await res.json();
@@ -92,7 +95,10 @@ async function handleCreateGame() {
 async function handleDeleteGame(id) {
   if (!confirm('Delete this game?')) return;
   try {
-    await fetch(`/api/games/${id}`, { method: 'DELETE' });
+    await fetch(`/api/games/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` }
+    });
     if (String(id) === getGameId()) setGameId(null);
     await loadGames();
   } catch (err) {

@@ -58,6 +58,34 @@ export default async function init() {
       td.appendChild(btn);
       tr.appendChild(td);
       table.appendChild(tr);
+
+      const gmTd = document.createElement('td');
+      const gmInput = document.createElement('input');
+      gmInput.className = 'form-control form-control-sm';
+      gmInput.placeholder = 'Game ID';
+      const gmBtn = document.createElement('button');
+      gmBtn.className = 'btn btn-sm btn-secondary mt-1';
+      gmBtn.textContent = 'Assign GM';
+      gmBtn.addEventListener('click', async () => {
+        try {
+          const resp = await fetch(`/api/games/${gmInput.value}/users`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({ user_id: u.id, role: 'Game Master' })
+          });
+          if (!resp.ok) throw new Error(resp.status);
+          msgEl.textContent = '';
+        } catch (err) {
+          msgEl.textContent = 'Failed to assign GM';
+          console.error(err);
+        }
+      });
+      gmTd.appendChild(gmInput);
+      gmTd.appendChild(gmBtn);
+      tr.appendChild(gmTd);
     });
   } catch (err) {
     msgEl.textContent = 'Failed to load users';
