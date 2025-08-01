@@ -1,5 +1,6 @@
 import { supabase } from '../supabaseClient.js';
 import { sqlHelper } from '../library/sqlHelper.js';
+import * as logger from '../library/logger.js';
 
 const SQL = {
   GET_ALL_TILES: sqlHelper('territory/get_all_tiles.sql'),
@@ -20,7 +21,7 @@ export async function getTileById(id) {
 }
 
 export async function getAllTiles(game_id) {
-  console.log('getAllTiles', game_id);      // keep this log while testing
+  logger.log('getAllTiles', game_id);
   const { data, error } = await supabase.rpc('exec_sql', {
     sql_text: SQL.GET_ALL_TILES,
     params  : { game_id: game_id }          // ← snake case matches :game_id

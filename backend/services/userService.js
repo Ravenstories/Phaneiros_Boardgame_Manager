@@ -2,11 +2,9 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import * as userRepo from '../repositories/userRepository.js';
 import * as gameUserRepo from '../repositories/gameUserRepository.js';
+import { config } from '../config.js';
 
-const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET) {
-  throw new Error('JWT_SECRET environment variable must be set');
-}
+const JWT_SECRET = config.jwtSecret;
 
 export async function registerUser(email, password, details = {}) {
   const existing = await userRepo.getUserByEmail(email);
