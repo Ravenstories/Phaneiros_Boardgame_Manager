@@ -14,11 +14,20 @@ export default async function init() {
   try {
     await getSession();
     const token = getToken();
-    const res = await fetch('/api/users', {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    if (!res.ok) throw new Error(res.status);
-    const users = await res.json();
+    const [userRes, gameRes] = await Promise.all([
+      fetch('/api/users', { headers: { Authorization: `Bearer ${token}` } }),
+      fetch('/api/games')
+    ]);
+    if (!userRes.ok) {
+      const err = await userRes.json().catch(() => ({}));
+      throw new Error(`Users ${userRes.status}: ${err.error || userRes.statusText}`);
+    }
+    if (!gameRes.ok) {
+      const err = await gameRes.json().catch(() => ({}));
+      throw new Error(`Games ${gameRes.status}: ${err.error || gameRes.statusText}`);
+    }
+    const users = await userRes.json();
+    const games = await gameRes.json();
     table.innerHTML = '';
     users.forEach(u => {
       const tr = document.createElement('tr');
@@ -46,11 +55,14 @@ export default async function init() {
             },
             body: JSON.stringify({ role: select.value })
           });
-          if (!updateRes.ok) throw new Error(updateRes.status);
+          if (!updateRes.ok) {
+            const err = await updateRes.json().catch(() => ({}));
+            throw new Error(`${updateRes.status}: ${err.error || updateRes.statusText}`);
+          }
           tr.querySelector('.user-role').textContent = select.value;
           msgEl.textContent = '';
         } catch (err) {
-          msgEl.textContent = 'Failed to update role';
+          msgEl.textContent = `Failed to update role: ${err.message}`;
           console.error(err);
         }
       });
@@ -60,15 +72,27 @@ export default async function init() {
       table.appendChild(tr);
 
       const gmTd = document.createElement('td');
-      const gmInput = document.createElement('input');
-      gmInput.className = 'form-control form-control-sm';
-      gmInput.placeholder = 'Game ID';
+      const gmSelect = document.createElement('select');
+      gmSelect.className = 'form-select form-select-sm';
+      const placeholder = document.createElement('option');
+      placeholder.value = '';
+      placeholder.textContent = 'Select Game';
+      placeholder.selected = true;
+      placeholder.disabled = true;
+      gmSelect.appendChild(placeholder);
+      games.forEach(g => {
+        const opt = document.createElement('option');
+        opt.value = g.game_id;
+        opt.textContent = g.game_name ? `${g.game_name} (ID ${g.game_id})` : `Game ${g.game_id}`;
+        gmSelect.appendChild(opt);
+      });
       const gmBtn = document.createElement('button');
       gmBtn.className = 'btn btn-sm btn-secondary mt-1';
       gmBtn.textContent = 'Assign GM';
       gmBtn.addEventListener('click', async () => {
+        if (!gmSelect.value) return;
         try {
-          const resp = await fetch(`/api/games/${gmInput.value}/users`, {
+          const resp = await fetch(`/api/games/${gmSelect.value}/users`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -76,14 +100,17 @@ export default async function init() {
             },
             body: JSON.stringify({ user_id: u.id, role: 'Game Master' })
           });
-          if (!resp.ok) throw new Error(resp.status);
+          if (!resp.ok) {
+            const err = await resp.json().catch(() => ({}));
+            throw new Error(`${resp.status} ${err.code || ''} ${err.error || resp.statusText}`.trim());
+          }
           msgEl.textContent = '';
         } catch (err) {
-          msgEl.textContent = 'Failed to assign GM';
+          msgEl.textContent = `Failed to assign GM: ${err.message}`;
           console.error(err);
         }
       });
-      gmTd.appendChild(gmInput);
+      gmTd.appendChild(gmSelect);
       gmTd.appendChild(gmBtn);
       tr.appendChild(gmTd);
     });

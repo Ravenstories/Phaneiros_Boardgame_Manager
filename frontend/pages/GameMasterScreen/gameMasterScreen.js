@@ -2,7 +2,7 @@ import { getSession } from '../../services/api/userAPI.js';
 import { getToken } from '../../services/userStore.js';
 import { getGameId, setGameId } from '../../services/gameStore.js';
 
-let userId, token;
+let userId, token, userRole;
 
 export default async function init() {
   const newBtn = document.getElementById('gm-new');
@@ -15,6 +15,7 @@ export default async function init() {
   try {
     const user = await getSession();
     userId = user.id;
+    userRole = user.role;
     token = getToken();
     await loadGames();
   } catch (err) {
@@ -29,20 +30,32 @@ async function loadGames() {
   listEl.innerHTML = '';
   msgEl.textContent = '';
   try {
-    const res = await fetch(`/api/users/${userId}/games`, {
+    const endpoint =
+      userRole === 'Admin'
+        ? '/api/games'
+        : `/api/users/${userId}/games`;
+    const res = await fetch(endpoint, {
       headers: { Authorization: `Bearer ${token}` }
     });
-    if (!res.ok) throw new Error(res.status);
-    const games = await res.json();
-    const gmGames = games.filter(g => g.role === 'Game Master');
-    if (!gmGames.length) {
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(`${res.status}: ${err.error || res.statusText}`);
+    }
+    let games;
+    if (userRole === 'Admin') {
+      games = await res.json();
+    } else {
+      const assignments = await res.json();
+      games = assignments.filter(g => g.role === 'Game Master');
+    }
+    if (!games.length) {
       msgEl.textContent = 'No managed games.';
       return;
     }
-    for (const g of gmGames) {
+    for (const g of games) {
       const li = document.createElement('li');
       li.className = 'list-group-item';
-      li.innerHTML = `<div>Game ${g.game_id}</div>`;
+      li.innerHTML = `<div>${g.game_name ? g.game_name : 'Game'} ${g.game_id}</div>`;
       const delBtn = document.createElement('button');
       delBtn.className = 'btn btn-sm btn-danger ms-2';
       delBtn.textContent = 'Delete';
@@ -69,7 +82,7 @@ async function loadGames() {
       }
     }
   } catch (err) {
-    msgEl.textContent = 'Failed to load games';
+    msgEl.textContent = `Failed to load games: ${err.message}`;
     console.error(err);
   }
 }

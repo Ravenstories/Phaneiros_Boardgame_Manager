@@ -71,7 +71,8 @@ router.get('/users/:id/games', authenticate, requireSelfOrRole('Admin'), async (
     const list = await userService.listUserGames(req.params.id);
     res.json(list);
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    const status = err.status || 400;
+    res.status(status).json({ error: err.message, code: err.code });
   }
 });
 
@@ -85,7 +86,8 @@ router.post('/games/:id/users', authenticate, requireRole('Admin'), async (req, 
     );
     res.status(201).json(assignment);
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    const status = err.status || 400;
+    res.status(status).json({ error: err.message, code: err.code });
   }
 });
 
@@ -100,7 +102,8 @@ router.get('/games/:id/users', authenticate, async (req, res) => {
     const list = await userService.listGameUsers(req.params.id);
     res.json(list);
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    const status = err.status || 400;
+    res.status(status).json({ error: err.message, code: err.code });
   }
 });
 
@@ -113,7 +116,8 @@ router.put('/games/:id/users/:userId', authenticate, requireRole('Admin'), async
     );
     res.json(updated);
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    const status = err.status || 400;
+    res.status(status).json({ error: err.message, code: err.code });
   }
 });
 
