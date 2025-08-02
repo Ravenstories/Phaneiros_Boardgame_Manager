@@ -3,14 +3,29 @@ import { getToken } from '../../services/userStore.js';
 import { getGameId, setGameId } from '../../services/gameStore.js';
 
 let userId, token, userRole;
+let modal, typeSelect, typeInput, nameInput;
 
 export default async function init() {
   const newBtn = document.getElementById('gm-new');
   const refreshBtn = document.getElementById('gm-refresh');
   const msgEl = document.getElementById('gm-msg');
 
-  newBtn.addEventListener('click', handleCreateGame);
+  // Modal elements
+  const modalEl = document.getElementById('gm-modal');
+  modal = new window.bootstrap.Modal(modalEl);
+  typeSelect = document.getElementById('gm-type-select');
+  typeInput = document.getElementById('gm-type-new');
+  nameInput = document.getElementById('gm-name');
+  const form = document.getElementById('gm-form');
+
+  newBtn.addEventListener('click', async () => {
+    await loadGameTypes();
+    typeInput.value = '';
+    nameInput.value = '';
+    modal.show();
+  });
   refreshBtn.addEventListener('click', loadGames);
+  form.addEventListener('submit', handleCreateGame);
 
   try {
     const user = await getSession();
@@ -87,7 +102,13 @@ async function loadGames() {
   }
 }
 
-async function handleCreateGame() {
+async function handleCreateGame(e) {
+  e.preventDefault();
+  const chosen = typeSelect.value;
+  const custom = typeInput.value.trim();
+  const gameType = custom || chosen;
+  const gameName = nameInput.value.trim();
+  if (!gameType || !gameName) return;
   try {
     const res = await fetch('/api/games', {
       method: 'POST',
@@ -95,11 +116,36 @@ async function handleCreateGame() {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`
       },
-      body: JSON.stringify({ game_type: 'kingdom' })
+      body: JSON.stringify({ game_type: gameType, game_name: gameName })
     });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(`${res.status}: ${err.error || res.statusText}`);
+    }
     const { game_id } = await res.json();
     setGameId(game_id);
+    modal.hide();
     await loadGames();
+    await loadGameTypes();
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+async function loadGameTypes() {
+  try {
+    const res = await fetch('/api/games/types', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error('Failed to load types');
+    const types = await res.json();
+    typeSelect.innerHTML = '<option value="">-- choose type --</option>';
+    types.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t;
+      opt.textContent = t;
+      typeSelect.appendChild(opt);
+    });
   } catch (err) {
     console.error(err);
   }

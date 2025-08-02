@@ -6,12 +6,15 @@ export const GameService = {
   get(id) {
     return repo.getGameById(id);
   },
-  async create(type, creatorId) {
-    const id = await repo.createGame(type);
-    if (creatorId) {
-      try {
-        await gameUserRepo.assignUserToGame(creatorId, id, 'Game Master');
-      } catch (err) {
+  listTypes() {
+    return repo.getGameTypes();
+  },
+  async create(type, name, creatorId) {
+  const id = await repo.createGame(type, name);
+  if (creatorId) {
+    try {
+      await gameUserRepo.assignUserToGame(creatorId, id, 'Game Master');
+    } catch (err) {
         // ignore assignment failure; game still created
         console.error(err);
       }

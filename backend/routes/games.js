@@ -7,14 +7,12 @@ import { authenticate, requireRole, requireGameMaster } from '../middleware/auth
 export const gamesRouter = express.Router();
 
 /* ────────────────────────────────────────────────
-   GET /api/games/:game_id   →  one game row
+   GET /api/games/types → list distinct game types
    ──────────────────────────────────────────────── */
-gamesRouter.get('/:game_id(\\d+)', async (req, res) => {
+gamesRouter.get('/types', async (_req, res) => {
   try {
-    const id   = Number(req.params.game_id);
-    const game = await GameService.get(id);   // ← we add this in GameService
-    if (!game) return res.status(404).json({ message: 'Game not found' });
-    res.json(game);
+    const types = await GameService.listTypes();
+    res.json(types);
   } catch (err) {
     logger.error(err);
     res.status(500).json({ message: err.message });
@@ -34,12 +32,28 @@ gamesRouter.get('/', async (_req, res) => {
 });
 
 /* ────────────────────────────────────────────────
+   GET /api/games/:game_id   →  one game row
+   ──────────────────────────────────────────────── */
+gamesRouter.get('/:game_id', async (req, res) => {
+  try {
+    const id   = req.params.game_id;
+    const game = await GameService.get(id);
+    if (!game) return res.status(404).json({ message: 'Game not found' });
+    res.json(game);
+  } catch (err) {
+    logger.error(err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
+/* ────────────────────────────────────────────────
    POST /api/games         →  create new game
    body: { "game_type": "kingdom" }
    ──────────────────────────────────────────────── */
 gamesRouter.post('/', authenticate, express.json(), async (req, res) => {
   try {
-    const id = await GameService.create(req.body.game_type, req.user.id);
+    const { game_type, game_name } = req.body;
+    const id = await GameService.create(game_type, game_name, req.user.id);
     res.status(201).json({ game_id: id });
   } catch (err) {
     logger.error(err);

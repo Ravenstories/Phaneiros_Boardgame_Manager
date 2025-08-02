@@ -22,6 +22,7 @@ jest.unstable_mockModule('../backend/repositories/gameRepository.js', () => ({
   getGameById: jest.fn(),
   getAllGames: jest.fn(),
   createGame: jest.fn(),
+  getGameTypes: jest.fn(),
 }));
 
 const repo = await import('../backend/repositories/gameRepository.js');
@@ -34,5 +35,14 @@ describe('GameService.get', () => {
     const result = await GameService.get(1);
     expect(repo.getGameById).toHaveBeenCalledWith(1);
     expect(result).toBe(fakeGame);
+  });
+});
+
+describe('GameService.listTypes', () => {
+  it('returns list of game types from repo', async () => {
+    repo.getGameTypes.mockResolvedValue(['a', 'b']);
+    const types = await GameService.listTypes();
+    expect(repo.getGameTypes).toHaveBeenCalled();
+    expect(types).toEqual(['a', 'b']);
   });
 });

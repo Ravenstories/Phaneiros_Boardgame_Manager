@@ -8,6 +8,7 @@ const SQL = {
   CREATE : sqlHelper('game/create.sql'),
   DELETE : sqlHelper('game/delete.sql'),
   UPDATE : sqlHelper('game/update.sql'),
+  TYPES  : sqlHelper('game/get_types.sql'),
 };
 
 export async function getAllGames () {
@@ -30,9 +31,11 @@ export async function getGameById(gameId) {
   return data[0] ?? null;
 }
 
-export async function createGame (gameType = 'kingdom') {
-  const { data, error } = await supabase.rpc('exec_sql',
-    { sql_text: SQL.CREATE, params: { gameType } });
+export async function createGame (gameType = 'kingdom', gameName) {
+  const { data, error } = await supabase.rpc('exec_sql', {
+    sql_text: SQL.CREATE,
+    params: { game_type: gameType, game_name: gameName },
+  });
   if (error) throw new Error(error.message);
   return data[0].game_id;
 }
@@ -53,4 +56,13 @@ export async function updateGame (gameId, updates) {
   });
   if (error) throw new Error(error.message);
   return data[0];
+}
+
+export async function getGameTypes() {
+  const { data, error } = await supabase.rpc('exec_sql', {
+    sql_text: SQL.TYPES,
+    params  : {},
+  });
+  if (error) throw new Error(error.message);
+  return data.map(row => row.game_type);
 }

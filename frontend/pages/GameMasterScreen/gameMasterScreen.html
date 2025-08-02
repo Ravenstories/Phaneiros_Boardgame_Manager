@@ -7,5 +7,35 @@
   </div>
   <ul id="gm-games" class="list-group mb-3"></ul>
   <p id="gm-msg" class="text-danger"></p>
+  
+  <!-- Create Game Modal -->
+  <div class="modal fade" id="gm-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <form id="gm-form" class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Create Game</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="gm-name" class="form-label">Game Name</label>
+            <input id="gm-name" type="text" class="form-control" placeholder="Name" />
+          </div>
+          <div class="mb-3">
+            <label for="gm-type-select" class="form-label">Game Type</label>
+            <select id="gm-type-select" class="form-select"></select>
+          </div>
+          <div class="mb-3">
+            <label for="gm-type-new" class="form-label">Or New Type</label>
+            <input id="gm-type-new" type="text" class="form-control" placeholder="New game type" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create</button>
+        </div>
+      </form>
+    </div>
+  </div>
   </div>
 </main>
