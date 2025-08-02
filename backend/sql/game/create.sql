@@ -1,3 +1,3 @@
 insert into game (game_type, game_name)
-values (:gameType, :gameName)
+values (:game_type, :game_name)
 returning game_id;
