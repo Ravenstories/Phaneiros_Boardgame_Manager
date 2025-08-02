@@ -15,7 +15,7 @@ gamesRouter.get('/types', async (_req, res) => {
     res.json(types);
   } catch (err) {
     logger.error(err);
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -27,7 +27,7 @@ gamesRouter.get('/', async (_req, res) => {
     res.json(await GameService.list());
   } catch (err) {
     logger.error(err);
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -42,7 +42,7 @@ gamesRouter.get('/:game_id', async (req, res) => {
     res.json(game);
   } catch (err) {
     logger.error(err);
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -57,7 +57,7 @@ gamesRouter.post('/', authenticate, express.json(), async (req, res) => {
     res.status(201).json({ game_id: id });
   } catch (err) {
     logger.error(err);
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -70,6 +70,6 @@ gamesRouter.delete('/:game_id', authenticate, requireGameMaster('game_id'), asyn
     res.status(204).end();
   } catch (err) {
     logger.error(err);
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ error: err.message });
   }
 });

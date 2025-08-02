@@ -28,4 +28,10 @@ describe('gameRepository.createGame', () => {
     expect(args.sql_text).toMatch(/:game_type/);
     expect(args.sql_text).toMatch(/:game_name/);
   });
+
+  it('handles single object responses from Supabase', async () => {
+    rpcMock.mockResolvedValueOnce({ data: { game_id: '2' }, error: null });
+    const id = await repo.createGame('baz', 'Qux');
+    expect(id).toBe('2');
+  });
 });
