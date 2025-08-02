@@ -38,7 +38,7 @@ export async function getGameById(gameId) {
 export async function createGame (gameType = 'kingdom', gameName) {
   const { data, error } = await supabase.rpc('exec_sql', {
     sql_text: SQL.CREATE,
-    params: { game_type: gameType, game_name: gameName },
+    params: { gameType, gameName },
   });
   if (error) throw new Error(error.message);
   const row = firstRow(data);

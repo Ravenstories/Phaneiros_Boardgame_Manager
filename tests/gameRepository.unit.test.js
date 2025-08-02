@@ -1,3 +1,4 @@
++38-0
 import { jest } from '@jest/globals';
 
 process.env.JWT_SECRET = process.env.JWT_SECRET || 'testsecret';
@@ -23,10 +24,10 @@ describe('gameRepository.createGame', () => {
     expect(rpcMock).toHaveBeenCalledTimes(1);
     const [fn, args] = rpcMock.mock.calls[0];
     expect(fn).toBe('exec_sql');
-    expect(args.params).toEqual({ game_type: 'foo', game_name: 'Bar' });
+    expect(args.params).toEqual({ gameType: 'foo', gameName: 'Bar' });
     expect(args.sql_text).toMatch(/game_type,\s*game_name/i);
-    expect(args.sql_text).toMatch(/:game_type/);
-    expect(args.sql_text).toMatch(/:game_name/);
+    expect(args.sql_text).toMatch(/:gameType/);
+    expect(args.sql_text).toMatch(/:gameName/);
   });
 
   it('handles single object responses from Supabase', async () => {
